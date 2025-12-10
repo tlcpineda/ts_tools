@@ -1,7 +1,7 @@
 # Typesetting Tools
 This is a collection of Python and ExtendScripts codes to assist in my manga in typesetting work in Photoshop.
 
-Development started as standalone files, run either as exectuable files or wrapped in an action script within Photoshop, before the set up of this GitHub account.
+Development started as standalone files, run either as executable files or wrapped in an action script within Photoshop, before the set up of this GitHub account.
 
 ## Project Tags (Personal)
 

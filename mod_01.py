@@ -1,6 +1,8 @@
+import os
 import lib
 import fitz
-import tkinter as tk
+
+from lib import identify_path
 
 """
 Takes a PDF file with comments as input.
@@ -11,13 +13,13 @@ Saves each comment in a CSV file with the following parameters :
     {text} - text of the comment
 """
 
-def random_fun():
-    pass
+def process_file(filepath: str) -> None:
+    num_pages
 
 
 # Global variables
 mod_name = "PDF Comments Scraper"
-mod_rel = "1"
+mod_ver = "1"
 date = "10 Dec 2025"
 email = "tlcpineda.projects@gmail.com"
 
@@ -25,8 +27,34 @@ email = "tlcpineda.projects@gmail.com"
 if __name__ == '__main__':
     lib.welcome_sequence([
         mod_name,
-        f"ver {mod_rel} {date}",
+        f"ver {mod_ver} {date}",
         email
     ])
 
-    random_fun()
+    print(input("\n>>> Press enter to continue ..."))
+
+    confirm_exit = False
+
+    while not confirm_exit:
+        print("\n>>> Select a PDF file to scrape ...")
+
+        path = identify_path("file")
+
+        if path:
+            filename = os.path.basename(path)
+
+            print(f"\n<=> File selected : {filename}")
+
+            process_file(path)
+        else:
+            print("\n<=> No file selected.")
+
+        if lib.continue_sequence() == "X":
+            confirm_exit = True
+
+            print("\n<=> Closing down ...")
+        else:
+            confirm_exit = False
+
+            print("\n<=> Restarting ...")
+
