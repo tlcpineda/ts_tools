@@ -5,7 +5,7 @@ Development started as standalone files, run either as exectuable files or wrapp
 
 ## Project Tags (Personal)
 
-| <div style="width: 250px;"> Project ID </div> | Title | Short Description |
+| Project ID | Title | Short Description |
 |:--- |:--- |:--- |
 | 2025-09-T-0024-P | PDF COMMENTS TO PSD PART 1 | PDF comments saved in a CSV file |
 | 2025-09-T-0025-J | PDF COMMENTS TO PSD PART 2 | CSV data to PSD files |
