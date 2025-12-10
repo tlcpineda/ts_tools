@@ -11,6 +11,10 @@ Saves each comment in a CSV file with the following parameters :
     {text} - text of the comment
 """
 
+def random_fun():
+    pass
+
+
 # Global variables
 mod_name = "PDF Comments Scraper"
 mod_rel = "1"
@@ -24,3 +28,5 @@ if __name__ == '__main__':
         f"ver {mod_rel} {date}",
         email
     ])
+
+    random_fun()
