@@ -43,7 +43,7 @@ def continue_sequence() -> str:
     while not proper_resp:
         print("\n>>> Select an option :"
               "\n>>>  [C]ontinue with another chapter ?"
-              "\n>>>  E[X]it and close the window ?")
+              "\n>>>  E[X]it and close this window ?")
 
         resp = input(">>> ").upper()
 
@@ -56,4 +56,4 @@ def display_message(tag: str, message: str, exception: str=None) -> None:
     print(f"\n<=> [{tag}] {message}")
 
     if exception:
-        print(f"<=>  exception")
+        print(f"<=>  {exception}")

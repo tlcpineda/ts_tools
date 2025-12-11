@@ -19,7 +19,13 @@ date = "10 Dec 2025"
 email = "tlcpineda.projects@gmail.com"
 csv_name = "translations.csv"   # The filename of the output CSV file
 
-def process_file(filepath: str) -> None:
+def process_file(filepath: str, rtl: bool) -> None:
+    """
+    Scrape PDF file for comments.
+    :param filepath: The file path of the PDF file
+    :param rtl: Whether RTL reading order will be applied
+    :return:
+    """
     header = [
         "page_num",
         "x0",
@@ -30,17 +36,19 @@ def process_file(filepath: str) -> None:
     ]
     data_rows = []
     dirname, filename = os.path.split(filepath)
+    split_dirname = dirname.split("/")
+    num_folders = 3
+    process_dirname = dirname if len(split_dirname) <= num_folders else f".../{"/".join(split_dirname[-3:])}"
 
-    print(dirname, filename)
     print(f"\n<=> Processing file :"
-          f"\n<=>  Directory : {dirname}"
+          f"\n<=>  Directory : {process_dirname}"
           f"\n<=>  Filename  : {filename}")
 
     try:
         doc = fitz.open(filepath)
-        col_size = [4, 8]
+        col_size = [6, 10]
 
-        print("\nSummary :")
+        print("\n<=> Summary :")
         print(f"<=> | {"Page":>{col_size[0]}} | {"Comments":>{col_size[1]}} |")
 
         for page_index, page in enumerate(doc):
@@ -49,6 +57,7 @@ def process_file(filepath: str) -> None:
             page_width, page_height = page_rect.width, page_rect.height
             types = [0, 2]  # PDF_ANNOT_TEXT, PDF_ANNOT_FREE_TEXT
             annots = page.annots(types=types)
+            annots_len = len(list(annots))
 
             for annot in annots:
                 annot_rect = annot.rect
@@ -67,10 +76,10 @@ def process_file(filepath: str) -> None:
                     comment
                 ])
 
-            print(f"<=> | {page_num:>{col_size[0]}} | {len(list(annots)):>{col_size[1]}} |")
+            print(f"<=> | {page_num:>{col_size[0]}} | {annots_len:>{col_size[1]}} |")
 
         doc.close()
-        write_to_csv(dirname, [header] + data_rows)
+        # write_to_csv(dirname, [header] + data_rows)
 
     except Exception as e:
         display_message(
@@ -147,13 +156,32 @@ if __name__ == '__main__':
     confirm_exit = False
 
     while not confirm_exit:
-        print("\n>>> Select a PDF file to scrape ...")
+        print(">>> Select a PDF file to scrape ...")
 
         path = identify_path("file")
 
         if path:
-            # filename = os.path.basename(path)
-            process_file(path)
+            print(f"\n<=> File selected : {os.path.basename(path)}")
+            print(f"\n>>> Sort comments according to Japanese reading order (RTL) ?")
+
+            jp_read_order = None
+
+            while jp_read_order is None:
+                print(">>>  [Y]es or Enter to apply RTL sort order.")
+                print(">>>  [N]o to keep LRT sort order..")
+                jp_read_order = input(">>>  ")
+
+                if jp_read_order.upper() not in ["Y", "N", ""]:
+                    jp_read_order = None
+                    print("")
+                elif jp_read_order.upper() in ["Y", ""]:
+                    jp_read_order = True
+                else:
+                    jp_read_order = False
+
+            print(f"\n<=> RTL sort order will{" " if jp_read_order else " not "}be applied.")
+
+            process_file(path, jp_read_order)
         else:
             print("\n<=> No file selected.")
 
