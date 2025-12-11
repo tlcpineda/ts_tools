@@ -3,6 +3,10 @@ This is a collection of Python and ExtendScripts codes to assist in my manga in 
 
 Development started as standalone files, run either as executable files or wrapped in an action script within Photoshop, before the set up of this GitHub account.
 
+## Directory
+* __mod_01.py__ (PDF Comments Scraper) - creates a CSV file containing all the comments in the PDF file.  CSV file is used in pasting the comments to respective PSD files.
+  
+
 ## Project Tags (Personal)
 
 | Project ID | Title | Short Description |
