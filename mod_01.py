@@ -36,11 +36,6 @@ def process_file(filepath: str) -> None:
           f"\n<=>  Directory : {dirname}"
           f"\n<=>  Filename  : {filename}")
 
-    # Convert millimeters to points, for the dimensions of the text box in Photoshop.
-    mm_to_pt = 72    # 72 points to 1 in (25.4 mm)
-    w_box = 1.25 * mm_to_pt
-    h_box = 1.75 * mm_to_pt
-
     try:
         doc = fitz.open(filepath)
         col_size = [4, 8]
@@ -55,14 +50,12 @@ def process_file(filepath: str) -> None:
             types = [0, 2]  # PDF_ANNOT_TEXT, PDF_ANNOT_FREE_TEXT
             annots = page.annots(types=types)
 
-            # print(f"width : {page_width}, height : {page_height}")
-
             for annot in annots:
                 annot_rect = annot.rect
                 x0_norm = annot_rect.x0 / page_width
                 y0_norm = annot_rect.y0 / page_height
-                w_norm = annot_rect.width / page_width
-                h_norm = annot_rect.height / page_height
+                w_norm = 1.25 * 72 / page_width # Inches to points conversion before normalisation
+                h_norm = 1.75 * 72 / page_height
                 comment = clean_up(annot.info['content'])
 
                 data_rows.append([
@@ -77,6 +70,7 @@ def process_file(filepath: str) -> None:
             print(f"<=> | {page_num:>{col_size[0]}} | {len(list(annots)):>{col_size[1]}} |")
 
         doc.close()
+        write_to_csv(dirname, [header] + data_rows)
 
     except Exception as e:
         display_message(
@@ -84,8 +78,6 @@ def process_file(filepath: str) -> None:
             f"Error processing \"{filename}\"",
             f"{e}"
         )
-
-    write_to_csv(dirname, [header] + data_rows)
 
 
 def clean_up(comment: str) -> str:
