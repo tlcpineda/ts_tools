@@ -6,11 +6,11 @@ Saves each comment in a CSV file with the following parameters :
     {w, h} - width and height of the comment box, normalised with respect to the dimensions of the PDF page
     {text} - text of the comment
 """
-
+import csv
 import os
 import fitz
 
-from lib import welcome_sequence, identify_path, continue_sequence, display_error
+from lib import welcome_sequence, identify_path, continue_sequence, display_message
 
 # Global variables
 mod_name = "PDF Comments Scraper"
@@ -77,14 +77,15 @@ def process_file(filepath: str) -> None:
             print(f"<=> | {page_num:>{col_size[0]}} | {len(list(annots)):>{col_size[1]}} |")
 
         doc.close()
-        write_to_csv(dirname, [header] + data_rows)
 
     except Exception as e:
-        display_error(
+        display_message(
             "ERROR",
             f"Error processing \"{filename}\"",
-            e
+            f"{e}"
         )
+
+    write_to_csv(dirname, [header] + data_rows)
 
 
 def clean_up(comment: str) -> str:
@@ -95,8 +96,8 @@ def clean_up(comment: str) -> str:
     guillemets, both initial and terminal, by a quotation mark; or,
     any other characters that may be defined in the future in rep_dict; and,
     multiple white spaces by a single space.
-    :param comment:
-    :return clean_comment:
+    :param comment: The string to be cleaned up
+    :return clean_comment: The resulting string
     """
     clean_comment = comment.strip()
 
@@ -117,7 +118,29 @@ def clean_up(comment: str) -> str:
 
 
 def write_to_csv(directory: str, data: list) -> None:
+    """
+    Transfer the data to a CSV file named "translations.csv" (csv_name),
+    with the file saved in the same directory as the source PDF file.
+    :param directory: The parent directory of the source PDF file.
+    :param data: A 2D array containing the comments in each page, with header row.
+    :return: None
+    """
+    try:
+        csv_path = os.path.join(directory, csv_name)
+        with open(csv_path, "w", newline="", encoding="utf-8") as file:
+            csv.writer(file).writerows(data)
 
+        display_message(
+            "SUCCESS",
+            f"{len(data) - 1} comments written to {csv_name}."
+        )
+
+    except Exception as e:
+        display_message(
+            "ERROR",
+            f"Error writing to CSV file {csv_name}.",
+            f"{e}"
+        )
 
 
 if __name__ == '__main__':

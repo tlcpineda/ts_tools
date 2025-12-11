@@ -5,7 +5,7 @@ Development started as standalone files, run either as executable files or wrapp
 
 ## Directory
 * __mod_01.py__ (PDF Comments Scraper) - creates a CSV file containing all the comments in the PDF file.  CSV file is used in pasting the comments to respective PSD files.
-  
+* __mod_02.jsx__ (CSV to PSD) - transfers the contents of the CSV file to corresponding PSD files.  
 
 ## Project Tags (Personal)
 

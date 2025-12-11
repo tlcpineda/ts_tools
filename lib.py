@@ -52,6 +52,8 @@ def continue_sequence() -> str:
     return resp
 
 
-def display_error(tag: str, message: str, exception: Exception) -> None:
-    print(f"\n<=> [{tag}] {message}"
-          f"\n<=>  {exception}")
+def display_message(tag: str, message: str, exception: str=None) -> None:
+    print(f"\n<=> [{tag}] {message}")
+
+    if exception:
+        print(f"<=>  exception")
