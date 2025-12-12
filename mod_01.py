@@ -51,13 +51,17 @@ def process_file(filepath: str, rtl: bool) -> None:
         print("\n<=> Summary :")
         print(f"<=> | {"Page":>{col_size[0]}} | {"Comments":>{col_size[1]}} |")
 
+
         for page_index, page in enumerate(doc):
+            if page_index > 0: return   # process only the first page while testing.
+
+            page_comments = []
+
             page_num = page_index + 1
             page_rect = page.rect
             page_width, page_height = page_rect.width, page_rect.height
             types = [0, 2]  # PDF_ANNOT_TEXT, PDF_ANNOT_FREE_TEXT
-            annots = page.annots(types=types)
-            annots_len = len(list(annots))
+            annots = list(page.annots(types=types))
 
             for annot in annots:
                 annot_rect = annot.rect
@@ -67,16 +71,20 @@ def process_file(filepath: str, rtl: bool) -> None:
                 h_norm = 1.75 * 72 / page_height
                 comment = clean_up(annot.info['content'])
 
-                data_rows.append([
+                page_comments.append([
                     f"{page_num:02}X",
-                    f"{x0_norm:.6f}",
-                    f"{y0_norm:.6f}",
+                    x0_norm,
+                    y0_norm,
+                    int(round(y0_norm / 0.05, 2)),    # bin, used in sorting vertically.
                     f"{w_norm:.6f}",
                     f"{h_norm:.6f}",
                     comment
                 ])
 
-            print(f"<=> | {page_num:>{col_size[0]}} | {annots_len:>{col_size[1]}} |")
+            # for comment in page_comments: print(comment)
+            for comment in sort_rtl(page_comments, rtl): print(comment)
+            data_rows = data_rows + sort_rtl(page_comments, rtl)   # Append sorted page comments to final list.
+            print(f"<=> | {page_num:>{col_size[0]}} | {len(annots):>{col_size[1]}} |")
 
         doc.close()
         # write_to_csv(dirname, [header] + data_rows)
@@ -116,6 +124,19 @@ def clean_up(comment: str) -> str:
     clean_comment = " ".join(clean_comment.split())
 
     return clean_comment
+
+
+def sort_rtl(page_data: list, rtl: bool) -> list:
+    """
+    Sort the comments according to (x0, y0).
+    :param page_data: The list of comments for the current page
+    :param rtl: True follows Japanese manga reading order.
+    :return: The reversed list of sorted comments; which reverts to proper order when transferred to Photoshop.
+    """
+    sorted_data = sorted(page_data, key=lambda x: ( -x[3], x[1] * rtl))
+
+    # Remove "bin" (index 3)), and truncate x0, y0 to 6 decimal places.
+    return list(map(lambda x: [x[0], f"{x[1]:6f}", f"{x[2]:6f}"] + x[4:], sorted_data))
 
 
 def write_to_csv(directory: str, data: list) -> None:
