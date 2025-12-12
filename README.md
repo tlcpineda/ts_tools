@@ -1,11 +1,18 @@
 # Typesetting Tools
 This is a collection of Python and ExtendScripts codes to assist in my manga in typesetting work in Photoshop.
 
-Development started as standalone files, run either as executable files or wrapped in an action script within Photoshop, before the set up of this GitHub account.
+Development started as standalone files something in October 2025, run either as executable files or wrapped in an action script within Photoshop, before the set-up of this GitHub account.  That is, before my old computer of 8 years crashed.
+
+I am attempting here to recreate the modules that have helped me reduced non-essential tasks in my typesetting work, as well as finally setting up and learning the ropes in GitHub (after so much delays to do so).
+
+Future development, as I see it, includes :
+1. a purely Python-based operation, to handle local processes;
+2. a Google Cloud project to handle the monitoring/movement of files in a shared Google Drive.  Monitoring is currently handled by a Google Apps Script bound to a Sheets log file; and,
+3. a Teams integration to alert team members of my latest submission.
 
 
 ## General Workflow
-One title - one or two languages.
+One title - one or two languages. (more to be added later)
 
 
 ## Directory
