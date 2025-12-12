@@ -1,6 +1,6 @@
+import os
 import tkinter as tk
 from tkinter import filedialog as fd
-import os
 
 def welcome_sequence(items: list):
     max_chars = len(max(items, key=len))
@@ -36,6 +36,19 @@ def identify_path(base_type: str) -> str:
     return path
 
 
+def display_file_desc(filepath: str) -> tuple:
+    dirname, filename = os.path.split(filepath)
+    split_dirname = dirname.split("/")
+    num_levels = 3
+    process_dirname = dirname if len(split_dirname) <= num_levels else f".../{"/".join(split_dirname[-3:])}"
+
+    print(f"\n<=> Processing file :"
+          f"\n<=>  Directory : {process_dirname}"
+          f"\n<=>  Filename  : {filename}")
+
+    return dirname, filename
+
+
 def continue_sequence() -> str:
     proper_resp = False
     resp = "C"
@@ -57,3 +70,4 @@ def display_message(tag: str, message: str, exception: str=None) -> None:
 
     if exception:
         print(f"<=>  {exception}")
+

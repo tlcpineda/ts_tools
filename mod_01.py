@@ -10,7 +10,7 @@ import csv
 import os
 import fitz
 
-from lib import welcome_sequence, identify_path, continue_sequence, display_message
+from lib import welcome_sequence, identify_path, display_file_desc, continue_sequence, display_message
 
 # Global variables
 mod_name = "PDF Comments Scraper"
@@ -19,13 +19,14 @@ date = "10 Dec 2025"
 email = "tlcpineda.projects@gmail.com"
 csv_name = "translations.csv"   # The filename of the output CSV file
 
-def process_file(filepath: str, rtl: bool) -> None:
+def process_file(filepath: str) -> None:
     """
     Scrape PDF file for comments.
     :param filepath: The file path of the PDF file
-    :param rtl: Whether RTL reading order will be applied
     :return:
     """
+    dirname, filename = display_file_desc(filepath)
+
     header = [
         "page_num",
         "x0",
@@ -35,14 +36,26 @@ def process_file(filepath: str, rtl: bool) -> None:
         "text"
     ]
     data_rows = []
-    dirname, filename = os.path.split(filepath)
-    split_dirname = dirname.split("/")
-    num_folders = 3
-    process_dirname = dirname if len(split_dirname) <= num_folders else f".../{"/".join(split_dirname[-3:])}"
 
-    print(f"\n<=> Processing file :"
-          f"\n<=>  Directory : {process_dirname}"
-          f"\n<=>  Filename  : {filename}")
+    # User input for right-to-left reading order
+    print(f"\n>>> Sort comments according to Japanese reading order (RTL) ?")
+
+    rtl = None
+
+    while rtl is None:
+        print(">>>  [Y]es or Enter to apply RTL sort order.")
+        print(">>>  [N]o to keep LRT sort order..")
+        rtl = input(">>>  ")
+
+        if rtl.upper() not in ["Y", "N", ""]:
+            rtl = None
+            print("")
+        elif rtl.upper() in ["Y", ""]:
+            rtl = True
+        else:
+            rtl = False
+
+    print(f"\n<=> RTL sort order will{" " if rtl else " not "}be applied.")
 
     try:
         doc = fitz.open(filepath)
@@ -177,30 +190,8 @@ if __name__ == '__main__':
 
         path = identify_path("file")
 
-        if path:
-            print(f"\n<=> File selected : {os.path.basename(path)}")
-            print(f"\n>>> Sort comments according to Japanese reading order (RTL) ?")
-
-            jp_read_order = None
-
-            while jp_read_order is None:
-                print(">>>  [Y]es or Enter to apply RTL sort order.")
-                print(">>>  [N]o to keep LRT sort order..")
-                jp_read_order = input(">>>  ")
-
-                if jp_read_order.upper() not in ["Y", "N", ""]:
-                    jp_read_order = None
-                    print("")
-                elif jp_read_order.upper() in ["Y", ""]:
-                    jp_read_order = True
-                else:
-                    jp_read_order = False
-
-            print(f"\n<=> RTL sort order will{" " if jp_read_order else " not "}be applied.")
-
-            process_file(path, jp_read_order)
-        else:
-            print("\n<=> No file selected.")
+        if path: process_file(path)
+        else: print("\n<=> No file selected.")
 
         if continue_sequence() == "X":
             confirm_exit = True

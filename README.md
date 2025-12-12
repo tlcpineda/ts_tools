@@ -3,6 +3,7 @@ This is a collection of Python and ExtendScripts codes to assist in my manga in 
 
 Development started as standalone files, run either as executable files or wrapped in an action script within Photoshop, before the set up of this GitHub account.
 
+
 ## General Workflow
 One title - one or two languages.
 
@@ -10,8 +11,8 @@ One title - one or two languages.
 ## Directory
 * __mod_01.py__ (PDF Comments Scraper) - creates a CSV file containing all the comments in the PDF file.  CSV file is used in pasting the comments to respective PSD files.
 * __mod_xx.jsx__ (CSV to PSD) - transfers the contents of the CSV file to corresponding PSD files.
+* __mod_03.py__ (Revisions) - mark PSD down files that needs to be edited.
 * __mod_xx.py__ (Rename Files) - append/remove markers to PSD filenames: ##x, x
-* __mod_xx.py__ (Revisions) - mark PSD down files that needs to be edited.
 * __mod_xx.py__ (Prepare Folders) - fetch working files, and create chapter folder/s under title/language
 
 
