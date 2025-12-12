@@ -1,0 +1,4 @@
+pyinstaller --onefile --windowed --paths ".venv/Lib/site-packages" --name="Module 1" mod_01.py
+pyinstaller --onefile --paths ".venv/Lib/site-packages" --name="Module 1" mod_01.py
+
+?? pyinstaller --onefile --name="Module 1" mod_01.py

@@ -53,10 +53,7 @@ def process_file(filepath: str, rtl: bool) -> None:
 
 
         for page_index, page in enumerate(doc):
-            if page_index > 0: return   # process only the first page while testing.
-
             page_comments = []
-
             page_num = page_index + 1
             page_rect = page.rect
             page_width, page_height = page_rect.width, page_rect.height
@@ -81,13 +78,12 @@ def process_file(filepath: str, rtl: bool) -> None:
                     comment
                 ])
 
-            # for comment in page_comments: print(comment)
-            for comment in sort_rtl(page_comments, rtl): print(comment)
             data_rows = data_rows + sort_rtl(page_comments, rtl)   # Append sorted page comments to final list.
+
             print(f"<=> | {page_num:>{col_size[0]}} | {len(annots):>{col_size[1]}} |")
 
         doc.close()
-        # write_to_csv(dirname, [header] + data_rows)
+        write_to_csv(dirname, [header] + data_rows)
 
     except Exception as e:
         display_message(
