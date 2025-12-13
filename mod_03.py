@@ -6,7 +6,7 @@ Rename folder from "2 TYPESETTING" TO "6 FINAL PSD"
 import fitz
 import os
 
-from lib import welcome_sequence, identify_path, display_path_desc, continue_sequence, display_message, mark_for_rev, \
+from lib import welcome_sequence, identify_path, display_path_desc, continue_sequence, display_message, process_pathname, \
     rename_path
 
 # Global variables
@@ -44,7 +44,7 @@ def process_rev_file(filepath: str) -> None:
 
             print(f"<=> | {page_num:>{col_size[0]}} | {len(annots) or "-":>{col_size[1]}} |")
 
-        folder0 = mark_for_rev(dirname, folder_name0, pages_marked) # Mark files for revision.
+        folder0 = process_pathname(2, dirname, folder_name0, pages_marked) # Mark files for revision.
 
         len_pages = len(pages_marked)
         message = "No revisions required for this chapter." # Default message for zero annotations.

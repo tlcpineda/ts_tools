@@ -73,10 +73,10 @@ def display_message(tag: str, message: str, exception: str=None) -> None:
         print(f"<=>  {exception}")
 
 
-def mark_for_rev(base_path: str, target: str=None, data: list=None) -> str:
+def process_pathname(case_num: int, base_path: str, target: str=None, data: list=None) -> str | None:
     psd_path = os.path.join(base_path, target)
 
-    if not psd_path: return
+    if not psd_path: return None
 
     display_path_desc(psd_path, "folder")
 
@@ -93,30 +93,81 @@ def mark_for_rev(base_path: str, target: str=None, data: list=None) -> str:
 
             if os.path.isfile(path0):
 
-                if " " in filename:
-                    filename0, page = filename.split(" ")
+                match case_num:
+                    # 1 Initial case when appending page markers ("##X") to original file name.
+                    case 1:
+                        page_num = filename[-2:]
 
-                    if page.isdigit() and page in data:
-                        new_filename = f"{filename}X{ext}"
-                        path1 = os.path.join(psd_path, new_filename)
+                        if page_num.isdigit():
+                            new_filename = f"{filename} {page_num}X{ext}"
+                            path1 = os.path.join(psd_path, new_filename)
 
-                        if path0 == path1:
+                            if path0 == path1:
+                                display_message(
+                                    "SKIP",
+                                    "File with the same target name exists."
+                                )
+                            else: rename_path(path0, path1, "file")
+                        else:
                             display_message(
                                 "SKIP",
-                                "File already marked."
+                                "Not a valid file path."
                             )
-                        else: rename_path(path0, path1, "file")
 
-                    else:
-                        display_message(
-                            "SKIP",
-                            f"No revisions required."
-                        )
-                else:
-                    display_message(
-                        "SKIP",
-                        "No page marker found."
-                    )
+                    # 2 Case when marking files for revision, with "X"
+                    case 2:
+                        if " " in filename:
+                            filename0, page = filename.split(" ")
+
+                            if page.isdigit() and page in data:
+                                new_filename = f"{filename}X{ext}"
+                                path1 = os.path.join(psd_path, new_filename)
+
+                                if path0 == path1:
+                                    display_message(
+                                        "SKIP",
+                                        "File already marked."
+                                    )
+                                else: rename_path(path0, path1, "file")
+                            else:
+                                display_message(
+                                    "SKIP",
+                                    f"No revisions required."
+                                )
+                        else:
+                            display_message(
+                                "SKIP",
+                                "No page marker found."
+                            )
+
+                    # 3 Case when cleaning up files name, prior to submission, remove page markers ("##" or "##X")
+                    case 3: #????
+                        if " " in filename:
+                            filename0, page = filename.split(" ")
+
+                            if page.isdigit():
+                                new_filename = f"{filename0}{ext}"
+                                path1 = os.path.join(psd_path, new_filename)
+
+                                if path0 == path1:
+                                    display_message(
+                                        "SKIP",
+                                        "File with the same name exists."
+                                    )
+                                else:
+                                    rename_path(path0, path1, "file")
+                            else:
+                                display_message(
+                                    "SKIP",
+                                    f"Not a valid file path."
+                                )
+                        else:
+                            display_message(
+                                "SKIP",
+                                "No page marker found."
+                            )
+
+
             else:
                 display_message(
                     "SKIP",
@@ -127,6 +178,7 @@ def mark_for_rev(base_path: str, target: str=None, data: list=None) -> str:
                 "SKIP",
                 "Not a PSD file."
             )
+
     return psd_path
 
 
