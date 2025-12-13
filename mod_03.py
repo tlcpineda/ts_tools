@@ -9,7 +9,7 @@ import os
 from lib import welcome_sequence, identify_path, display_path_desc, continue_sequence, display_message, process_pathname, \
     rename_path
 
-# Global variables
+# Module variables
 mod_name = "Revisions"
 mod_ver = "1"
 date = "12 Dec 2025"

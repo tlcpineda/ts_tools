@@ -12,7 +12,7 @@ import fitz
 
 from lib import welcome_sequence, identify_path, display_path_desc, continue_sequence, display_message
 
-# Global variables
+# Module variables
 mod_name = "PDF Comments Scraper"
 mod_ver = "1"
 date = "10 Dec 2025"
