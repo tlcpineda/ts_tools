@@ -44,7 +44,7 @@ def process_file(filepath: str) -> None:
 
     while rtl is None:
         print(">>>  [Y]es or Enter to apply RTL sort order.")
-        print(">>>  [N]o to keep LRT sort order..")
+        print(">>>  [N]o to keep LRT sort order.")
         rtl = input(">>>  ")
 
         if rtl.upper() not in ["Y", "N", ""]:
