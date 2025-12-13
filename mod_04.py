@@ -11,12 +11,13 @@ mod_ver = "1"
 date = "14 Dec 2025"
 email = "tlcpineda.projects@gmail.com"
 
-def rename_files(parent_path: str) -> None:
+def rename_files(folder_path: str) -> None:
     """
     Rename PSD files depending on append or remove method.
-    :param parent_path: The folder containing the PSD files to be renamed.
+    :param folder_path: The folder containing the PSD files to be renamed.
     :return:
     """
+    parent, base = display_path_desc(folder_path, "folder")
 
     # User input whether to append or remove page markers.
     print(f"\n>>> Select an option to rename files ...")
@@ -24,15 +25,19 @@ def rename_files(parent_path: str) -> None:
     method = None
 
     while method is None:
-        print(">>>  [A]ppend page markers (##X).")
-        print(">>>  [R]emove page markers (##X, ##).")
-        method = input(">>>  ")
+        print(">>>  [A]ppend page markers (##X).")  # process_pathname case 1
+        print(">>>  [R]emove page markers (##X, ##).") # process_pathname case 3
+        method = input(">>>  ").upper()
 
-        if method.upper() not in ["A", "R"]:
+        if method not in ["A", "R"]:
             method = None
-            print("")
+            print("<=> Select from the options : [A, R]\n")
 
-    print(f"\n<=> RTL sort order will{" " if method else " not "}be applied.")
+    method_case = {"A": 1, "R": 3,}
+
+    print(f"\n<=> Page markers to be {"appended to" if method == "A" else "removed from"} PSD files.")
+
+    process_pathname(method_case[method], folder_path)
 
 
 if __name__ == '__main__':

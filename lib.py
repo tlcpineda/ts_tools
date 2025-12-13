@@ -73,7 +73,7 @@ def display_message(tag: str, message: str, exception: str=None) -> None:
         print(f"<=>  {exception}")
 
 
-def process_pathname(case_num: int, base_path: str, target: str=None, data: list=None) -> str | None:
+def process_pathname(case_num: int, base_path: str, target: str="", data: list=None) -> str | None:
     psd_path = os.path.join(base_path, target)
 
     if not psd_path: return None
@@ -141,26 +141,20 @@ def process_pathname(case_num: int, base_path: str, target: str=None, data: list
                             )
 
                     # 3 Case when cleaning up files name, prior to submission, remove page markers ("##" or "##X")
-                    case 3: #????
+                    case 3:
                         if " " in filename:
                             filename0, page = filename.split(" ")
 
-                            if page.isdigit():
-                                new_filename = f"{filename0}{ext}"
-                                path1 = os.path.join(psd_path, new_filename)
+                            new_filename = f"{filename0}{ext}"
+                            path1 = os.path.join(psd_path, new_filename)
 
-                                if path0 == path1:
-                                    display_message(
-                                        "SKIP",
-                                        "File with the same name exists."
-                                    )
-                                else:
-                                    rename_path(path0, path1, "file")
-                            else:
+                            if path0 == path1:
                                 display_message(
                                     "SKIP",
-                                    f"Not a valid file path."
+                                    "File with the same name exists."
                                 )
+                            else:
+                                rename_path(path0, path1, "file")
                         else:
                             display_message(
                                 "SKIP",

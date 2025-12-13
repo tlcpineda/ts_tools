@@ -45,12 +45,11 @@ def process_file(filepath: str) -> None:
     while rtl is None:
         print(">>>  [Y]es or Enter to apply RTL sort order.")
         print(">>>  [N]o to keep LRT sort order.")
-        rtl = input(">>>  ")
+        user_in = input(">>>  ").upper()
 
-        if rtl.upper() not in ["Y", "N", ""]:
-            rtl = None
-            print("")
-        elif rtl.upper() in ["Y", ""]:
+        if user_in not in ["Y", "N", ""]:
+            print("<=> Select from the options : [Y, N, Enter]\n")
+        elif user_in in ["Y", ""]:
             rtl = True
         else:
             rtl = False
