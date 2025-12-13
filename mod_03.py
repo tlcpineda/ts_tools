@@ -4,22 +4,26 @@ Identifies pages with comments, ie possible revisions, and mark corresponding PS
 Rename folder from "2 TYPESETTING" TO "6 FINAL PSD"
 """
 import fitz
+import os
 
-from lib import welcome_sequence, identify_path, display_file_desc, continue_sequence, display_message
+from lib import welcome_sequence, identify_path, display_path_desc, continue_sequence, display_message, mark_for_rev, \
+    rename_path
 
 # Global variables
 mod_name = "Revisions"
 mod_ver = "1"
 date = "12 Dec 2025"
 email = "tlcpineda.projects@gmail.com"
+folder_name0 = "2 TYPESETTING"
+folder_name1 = "6 FINAL PSD"
 
-def process_rev_file(filepath: str) -> list:
+def process_rev_file(filepath: str) -> None:
     """
     Create a list of pages with comments, or markings, for revisions.
     :param filepath: The path pointing to the PDF file marked with revisions
     :return:
     """
-    dirname, filename = display_file_desc(filepath)
+    dirname, filename = display_path_desc(filepath, "file")
 
     try:
         doc = fitz.open(filepath)
@@ -36,25 +40,38 @@ def process_rev_file(filepath: str) -> list:
             # Select all pages with at least one annotation (usually of type [0, 2, 13).
             annots = list(page.annots())
 
-            if len(annots)>0: pages_marked.append(f"{page_num:2}")
+            if len(annots)>0: pages_marked.append(f"{page_num:02}")
 
-            print(f"<=> | {page_num:>{col_size[0]}} | {len(annots):>{col_size[1]}} |")
+            print(f"<=> | {page_num:>{col_size[0]}} | {len(annots) or "-":>{col_size[1]}} |")
+
+        folder0 = mark_for_rev(dirname, folder_name0, pages_marked) # Mark files for revision.
 
         len_pages = len(pages_marked)
         message = "No revisions required for this chapter." # Default message for zero annotations.
 
-        # TODO create function to mark the PSD files, and rename the folder containing the files.
-        if len_pages>0:
-            message = f"{len_pages} file{"s" if len_pages>1 else ""} marked for revision in {psd_dir}."
+        if len_pages>0: message = f"{len_pages} file{"s" if len_pages>1 else ""} marked for revision."
 
         display_message(
             "SUCCESS",
             message
         )
 
+        folder1 = os.path.join(dirname, folder_name1)
+
+        if folder0 != folder1:
+            rename_path(folder0, folder1, "folder")
+        else:
+            display_message(
+                "ERROR",
+                "Cannot rename folder."
+            )
 
     except Exception as e:
-        pass
+        display_message(
+            "ERROR",
+            "Failed marking files for revision.",
+            f"{e}"
+        )
 
 
 if __name__ == '__main__':
@@ -74,7 +91,7 @@ if __name__ == '__main__':
         path = identify_path("file")
 
         if path: process_rev_file(path)
-        # else: print("\n<=> No file selected.")
+        else: print("\n<=> No file selected.")
 
         if continue_sequence() == "X":
             confirm_exit = True

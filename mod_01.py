@@ -10,7 +10,7 @@ import csv
 import os
 import fitz
 
-from lib import welcome_sequence, identify_path, display_file_desc, continue_sequence, display_message
+from lib import welcome_sequence, identify_path, display_path_desc, continue_sequence, display_message
 
 # Global variables
 mod_name = "PDF Comments Scraper"
@@ -25,7 +25,7 @@ def process_file(filepath: str) -> None:
     :param filepath: The file path of the PDF file
     :return:
     """
-    dirname, filename = display_file_desc(filepath)
+    dirname, filename = display_path_desc(filepath, "file")
 
     header = [
         "page_num",
@@ -93,7 +93,7 @@ def process_file(filepath: str) -> None:
 
             data_rows = data_rows + sort_rtl(page_comments, rtl)   # Append sorted page comments to final list.
 
-            print(f"<=> | {page_num:>{col_size[0]}} | {len(annots):>{col_size[1]}} |")
+            print(f"<=> | {page_num:>{col_size[0]}} | {len(annots) or "-":>{col_size[1]}} |")
 
         doc.close()
         write_to_csv(dirname, [header] + data_rows)

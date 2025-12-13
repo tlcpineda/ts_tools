@@ -1,5 +1,6 @@
 import os
 import tkinter as tk
+from os.path import basename
 from tkinter import filedialog as fd
 
 def welcome_sequence(items: list):
@@ -36,17 +37,17 @@ def identify_path(base_type: str) -> str:
     return path
 
 
-def display_file_desc(filepath: str) -> tuple:
-    dirname, filename = os.path.split(filepath)
-    split_dirname = dirname.split("/")
+def display_path_desc(filepath: str, base_type: str) -> tuple:
+    parent_name, base_name = os.path.split(filepath)
+    split_parent_name = parent_name.split("/")
     num_levels = 3
-    process_dirname = dirname if len(split_dirname) <= num_levels else f".../{"/".join(split_dirname[-3:])}"
+    process_dirname = parent_name if len(split_parent_name) <= num_levels else f".../{"/".join(split_parent_name[-3:])}"
 
-    print(f"\n<=> Processing file :"
+    print(f"\n<=> Processing {base_type} :"
           f"\n<=>  Directory : {process_dirname}"
-          f"\n<=>  Filename  : {filename}")
+          f"\n<=>  Base Name : {base_name}")
 
-    return dirname, filename
+    return parent_name, base_name
 
 
 def continue_sequence() -> str:
@@ -70,4 +71,82 @@ def display_message(tag: str, message: str, exception: str=None) -> None:
 
     if exception:
         print(f"<=>  {exception}")
+
+
+def mark_for_rev(base_path: str, target: str=None, data: list=None) -> str:
+    psd_path = os.path.join(base_path, target)
+
+    if not psd_path: return
+
+    display_path_desc(psd_path, "folder")
+
+    for item in os.listdir(psd_path):
+        filename, ext = os.path.splitext(item)
+
+        display_message(
+            "PROCESSING",
+            f"{item} ..."
+        )
+
+        if ext==".psd": # Process only PSD files
+            path0 = os.path.join(psd_path, item)
+
+            if os.path.isfile(path0):
+
+                if " " in filename:
+                    filename0, page = filename.split(" ")
+
+                    if page.isdigit() and page in data:
+                        new_filename = f"{filename}X{ext}"
+                        path1 = os.path.join(psd_path, new_filename)
+
+                        if path0 == path1:
+                            display_message(
+                                "SKIP",
+                                "File already marked."
+                            )
+                        else: rename_path(path0, path1, "file")
+
+                    else:
+                        display_message(
+                            "SKIP",
+                            f"No revisions required."
+                        )
+                else:
+                    display_message(
+                        "SKIP",
+                        "No page marker found."
+                    )
+            else:
+                display_message(
+                    "SKIP",
+                    "Not a valid file path."
+                )
+        else:
+            display_message(
+                "SKIP",
+                "Not a PSD file."
+            )
+    return psd_path
+
+
+def rename_path(path_src: str, path_dst, pathtype: str) -> None:
+    base_src = os.path.basename(path_src)
+    base_dst = os.path.basename(path_dst)
+    try:
+        os.rename(path_src, path_dst)
+
+        display_message(
+            "SUCCESS",
+            f"F{pathtype[1:]} renamed."
+            f"\n<=>  From : {base_src}"
+            f"\n<=>  To   : {base_dst}"
+        )
+
+    except Exception as e:
+        display_message(
+            "ERROR",
+            f"Failed to rename {pathtype}.",
+            f"{e}"
+        )
 
