@@ -1,5 +1,11 @@
-// target photoshop
+/**
+ * @title Module 2: CSV to PSD
+ * @version 1.0
+ * @author tlcpineda.projects@gmail.com
+ * @description Transfer the contents of the CSV file to corresponding PSD files, ready for manual adjustments.
+ */
 
+#target: photoshop
 function main() {
     var doc = app.activeDocument;
 
@@ -71,16 +77,64 @@ function createParagraphText(doc, content, x0, y0, w_norm, h_norm) {
     textItem.justification = Justification.CENTER;
 }
 
-// Helper to handle CSV quotes and commas
-function parseCSVLine(line) {
-    var pattern = /("([^"]|"")*"|[^,]*)(,|$)/g;
-    var matches = line.match(pattern);
-    var result = [];
-    for (var i = 0; i < matches.length; i++) {
-        var val = matches[i].replace(/,$/, "");
-        result.push(val.replace(/^"|"$/g, "").replace(/""/g, '"'));
+
+/**
+ * Transform the string content of a CSV file to an array.
+ * @param {string} csv_str The contents of the CSV file
+ * @returns {Array} csv_arr An array representing the contents of the CSV file with each line as an element of the array.
+ */
+function parse_csv(csv_str) {
+    var csv_arr = [];
+    var lines = csv_str.split(/\r\n|\n/);
+
+    // Truncate header row.
+    for (var i=1; i<lines.length; i++) {
+        var lines_split = lines[i].split(',');
+
+        if (lines_split.length<6) continue; // Stop processing the line, possibly malformed.
+
+        var text = lines_split.slice(5).join(',');
+        var replacement_arr = [
+            ['""', '"'],
+            ['<>', '\r'],
+            ['\\.\\.', '...']
+        ]
+
+        var line = lines_split.slice(0, 5);
+        var is_valid = true;
+
+        // Convert items to float, except the first (remains as string).
+        for (var k=1; k<line.length; k++) {
+            var val = parseFloat(line[k]);
+
+            // Check if conversion
+            if (isNaN(val)) {
+                is_valid = false;
+                break;
+            } else {
+                line[k] = val;
+            }
+        }
+
+        if (!is_valid) continue; // Stop processing the line, possibly malformed.
+
+        // Strip enclosing quotation marks.
+        var text_terminal = text.length - 1;
+
+        if (text.charAt(0)==='"' && text.charAt(text_terminal)==='"') {
+            text = text.substring(1, text_terminal);
+        }
+
+        // Clean up text.
+        for (var j=0; j<replacement_arr.length; j++ ) {
+            text = text.replace(new RegExp(replacement_arr[j][0], 'g'), replacement_arr[j][1]);
+        }
+
+        csv_arr.push(line.concat([text]));
     }
-    return result;
+
+    return csv_arr
 }
 
+// Run the main function.
 main();

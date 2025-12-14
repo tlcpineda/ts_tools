@@ -69,6 +69,7 @@ def process_file(filepath: str) -> None:
             page_num = page_index + 1
             page_rect = page.rect
             page_width, page_height = page_rect.width, page_rect.height
+            # TODO insert method to mutate PDF coordinates to match PSD dimensions.
             types = [0, 2]  # PDF_ANNOT_TEXT, PDF_ANNOT_FREE_TEXT
             annots = list(page.annots(types=types))
 
