@@ -1,87 +1,53 @@
+// #target photoshop
+
 /**
  * @title Module 2: CSV to PSD
  * @version 1.0
  * @author tlcpineda.projects@gmail.com
  * @description Transfer the contents of the CSV file to corresponding PSD files, ready for manual adjustments.
+ * @param {Array} action_arr A 2D array describing the actions to be applied to the text layers. This is chapter- and language-sensitive.
  */
+function main(action_arr) {
+    var doc_units = toggle_doc_units();
 
-// #target photoshop
-
-// function main() {
-//     var doc = app.activeDocument;
-//
-//     // 2. Identify CSV location
-//     // Path logic: PSD is in "2 TYPESETTING", CSV is in the parent folder
-//     var psdFolder = doc.path;
-//     var parentFolder = psdFolder.parent;
-//     var csvFile = new File(parentFolder + "/translations.csv");
-//
-//     if (!csvFile.exists) {
-//         // Log error to a file if needed, but don't use 'alert'
-//         return;
-//     }
-//
-//     // 3. Read CSV Content
-//     csvFile.open('r');
-//     csvFile.encoding = "UTF-8";
-//     var content = csvFile.read();
-//     csvFile.close();
-//
-//     var lines = content.split(/\r\n|\n/);
-//
-//     // 4. Extract Page ID from PSD Filename (Last 2 digits before extension)
-//     // Matches your naming: MyMangaTitle_..._05.psd
-//     var docName = doc.name.split('.')[0];
-//     var pageID = docName.substring(docName.length - 2);
-//
-//     // 5. Process CSV Lines
-//     for (var i = 1; i < lines.length; i++) {
-//         if (lines[i] == "") continue;
-//
-//         var columns = parseCSVLine(lines[i]);
-//         var csvPageNum = columns[0].substring(0, 2); // Get "05" from "05X"
-//
-//         // Only process if CSV row matches current PSD page
-//         if (csvPageNum === pageID) {
-//             var x0 = parseFloat(columns[1]);
-//             var y0 = parseFloat(columns[2]);
-//             var w_norm = parseFloat(columns[4]);
-//             var h_norm = parseFloat(columns[5]);
-//             var text = columns[6].replace(/ <>/g, "\r");
-//
-//             createParagraphText(doc, text, x0, y0, w_norm, h_norm);
-//         }
-//     }
-// }
-
-
-function main() {
     var doc = app.activeDocument;
     var doc_name = doc.name;
     var doc_path = doc.path;
     var parent_folder = doc_path.parent;
-    var csv_file = new File(parent_folder + '/translations.csv');
 
     // Fetch CSV file contents.
-    if (!csv_file.exists) return;    // Early termination if CSV file containing translations is not found.
+    var csv_file = new File(parent_folder + '/translations.csv');
+
+    // Early termination if CSV file containing translations is not found.
+    if (!csv_file.exists) {
+        toggle_doc_units(doc_units);
+        return;
+    }
 
     csv_file.open('r');
     csv_file.encoding = 'UTF-8';
 
     var csv_str = csv_file.read();
+
+    csv_file.close();
+
     var csv_arr = parse_csv(csv_str);
 
     // Extract page marker from name of doc.
     var match = doc_name.match(/(\d{2}x)\.psd$/i);  // Get the page marker, just before the extension name.
     var page_mark = match && match.length > 1 ? match[1] : null;
 
-    if (page_mark === null) return; // Early termination if page_mark on filename is not found.
+    // Early termination if page_mark on filename is not found.
+    if (page_mark === null) {
+        toggle_doc_units(doc_units);
+        return;
+    }
 
     // Slice csv_arr for elements with matching page marker, before transfer text to currently open file.
     var doc_data = [];
 
     for (var i=0; i<csv_arr.length; i++) {
-        if (csv_arr[i][0].toUpperCase() === page_mark) doc_data.push(csv_arr[i]);
+        if (csv_arr[i][0].toUpperCase() === page_mark.toUpperCase()) doc_data.push(csv_arr[i]);
     }
 
     for (var j=0; j<doc_data.length; j++) {
@@ -89,6 +55,13 @@ function main() {
 
         transfer_text(doc, row[1], row[2], row[3], row[4], row[5]);
     }
+
+    // Apply actions only if defined.
+    if (action_arr && action_arr.length>0) {
+        apply_actions_to_text_layers(doc, action_arr);
+    }
+
+    toggle_doc_units(doc_units);
 }
 
 
@@ -105,7 +78,7 @@ function transfer_text(doc, x0_norm, y0_norm, w_norm, h_norm, contents) {
     var text_group_name = "TEXT";
     var text_group = null;
 
-    // Find Group with "TEXT" (case insensitive) in the name; otherwise create Group.
+    // Find Group with "TEXT" (case-insensitive) in the name; otherwise create Group.
     for (var i=0; i<doc.layerSets.length; i++) {
         if (doc.layerSets[i].name.toUpperCase().indexOf(text_group_name) !== -1) {
             text_group = doc.layerSets[i]
@@ -196,5 +169,64 @@ function parse_csv(csv_str) {
     return csv_arr
 }
 
+
+/**
+ * Change the ruler units to PIXELS, if not set already.
+ * @param {Enumerator} curr_units The current unit that is set.
+ * @returns {Enumerator} doc_units The unit to be set
+ */
+function toggle_doc_units(curr_units) {
+    var app_pref = app.preferences;
+    var doc_units = app_pref.rulerUnits;
+
+    if (typeof curr_units === 'undefined' || curr_units === null) {
+        // Set up to Units.PIXELS, if not yet set.
+        if (doc_units !== Units.PIXELS) app_pref.rulerUnits = Units.PIXELS;
+    } else {
+        // Revert to original app setting
+        app_pref.rulerUnits = curr_units;
+    }
+
+    return doc_units;
+}
+
+
+/**
+ * Apply pre-defined actions to each text layer.
+ * @param {Document} doc The currently active file
+ * @param {Array} action_groups A 2D array (chapter- and language-sensitive) describing the actions to be applied to each text layer.
+ */
+function apply_actions_to_text_layers(doc, action_arr) {
+    var text_group_name = "TEXT";
+    var text_group = null;
+
+    // Find Group with "TEXT" (case-insensitive) in the name.
+    for (var i=0; i<doc.layerSets.length; i++) {
+        if (doc.layerSets[i].name.toUpperCase().indexOf(text_group_name) !== -1) {
+            text_group = doc.layerSets[i]
+            break;
+        }
+    }
+
+    if (!text_group) return; // Early termination if "TEXT" group is not found; not expected.
+
+    // Loop through layers in the group, and apply action(s).
+    var layers = text_group.artLayers;
+    for (var j=0; j<layers.length; j++) {
+        doc.activeLayer = layers[j];
+
+        // Loop through each action, and apply to current layer.
+        for (var k=0; k<action_arr.length; k++) {
+            app.doAction(action_arr[k][0], action_arr[k][1])
+        }
+    }
+}
+
+
 // Run the main function.
-main();
+main([
+    // Consider recording a single action for Main+Language, to minimise run time.
+    ["action_name1", "action_set1"],    // Main text font style for the language
+    ["action_name2", "action_set2"],    // Language setting.
+]);
+
