@@ -46,11 +46,11 @@ As I see it, when all the component have been recreated includes :
 
 ## Directory
 
-1. [*] **mod_01.py** (PDF Comments Scraper) - creates a CSV file containing all the comments in the PDF file. CSV file is
+1. [x] **mod_01.py** (PDF Comments Scraper) - creates a CSV file containing all the comments in the PDF file. CSV file is
   used in pasting the comments to respective PSD files.
 2. [ ] **mod_02.jsx** (CSV to PSD) - transfers the contents of the CSV file to corresponding PSD files.
-3. [/] **mod_03.py** (Revisions) - mark PSD files that needs to be edited, rename parent folder.
-4. [/] **mod_04.py** (Rename Files) - append/remove page markers to/from PSD filenames: ##x, ##
+3. [x] **mod_03.py** (Revisions) - mark PSD files that needs to be edited, rename parent folder.
+4. [x] **mod_04.py** (Rename Files) - append/remove page markers to/from PSD filenames: ##x, ##
 5. [ ] **mod_xx.py** (Prepare Folders) - fetch working files, and create chapter folder/s under title/language
 
 ## Project Tags (Personal)
