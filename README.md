@@ -46,7 +46,7 @@ As I see it, when all the component have been recreated includes :
 
 ## Directory
 
-1. [/] **mod_01.py** (PDF Comments Scraper) - creates a CSV file containing all the comments in the PDF file. CSV file is
+1. [*] **mod_01.py** (PDF Comments Scraper) - creates a CSV file containing all the comments in the PDF file. CSV file is
   used in pasting the comments to respective PSD files.
 2. [ ] **mod_02.jsx** (CSV to PSD) - transfers the contents of the CSV file to corresponding PSD files.
 3. [/] **mod_03.py** (Revisions) - mark PSD files that needs to be edited, rename parent folder.
