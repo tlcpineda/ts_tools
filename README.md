@@ -15,25 +15,47 @@ One title is generally assigned to a typesetter. The main focus is to set the tr
 corresponding PSD files following typesetting guidelines. Depending on assignment, typically a typesetter is assigned
 two destination languages for the same title.
 
-**Files downloaded from Shared Drive Folders**
+**Files**
 
-* *ATN file* - (by title) action scripts; often title-based;
-* *Read Me* - (by title) guidelines for typesetting; often title-based;
-* *Working PSD Files* - (by chapter) multiple PSD files for the chapter; may or may not require additional processing, like removal
-  of elements from previous workflow;
-* *{Translations}.pdf* - (by chapter-language) file with comments containing the translated text;
+* Downloaded from Shared Drive Folder
+    * *ATN file* - (by title) action scripts; often title-based;
+    * *Read Me* - (by title) guidelines for typesetting; often title-based;
+    * *Working PSD Files* - (by chapter) multiple PSD files for the chapter; may or may not require additional
+      processing, like removal of elements from previous workflow;
+    * *{Translations}.pdf* - (by chapter-language) PDF file with comments containing the translated text; and,
+    * *{Review}.pdf* - (by chapter-language) PDF file containing revision requests.
 
-**Files uploaded to Shared Drive Folders**
+* Uploaded to Shared Drive Folders
+    * *{Typeset}.pdf* - (by chapter-language) file with fully typeset translated text, for review by translator and
+      coordinator; and,
+    * *Typeset PSD Files* - (by chapter-language) multiple PSD files for the chapter; for submission to QA, then to
+      client.
 
-* *{Typeset}.pdf* - (by chapter-language) file with fully typeset translated text, for review by translator and
-  coordinator;
-* *Typeset PSD Files* - (by chapter-language) multiple PSD files for the chapter; for submission to QA, then to client;
+**Processing**
 
-**Initial Workflow**
-
-1. [ ] ddd
-
-(_more to be added later_)
+* Initial
+    * Load *ATN file* to Photoshop.
+    * Review *Read Me* file.
+    * Install required font faces.
+* Pre-processing
+    * Clean up unnecessary elements on *Working PSD Files*; append page markers (##X) to filename.
+    * Prepare chapter folder(s); fetch cleaned *Working PSD Files* from repository.
+    * Scrape *{Translations}.pdf* and save to a CSV file.
+* Main
+    * Transfer contents of CSV file to corresponding PSD file; set to *Main* font style (as defined in chapter ATN
+      file), and other settings as set in chapter *Read Me* file and general typesetting guidelines.
+    * Adjust each text layer, following localisation and general typesetting guidelines.
+    * Compile *Typeset PSD Files* to a single PDF file (*{Typeset}.pdf*), and submit for review.
+    * Update translator and coordinator on Teams.
+    * Update personal monitoring log.
+* Chapter Submission
+    * Address revision requests as marked on *{Review}.pdf* to *Typeset PSD Files*.
+    * Upload *{Typeset PSD Files}* to designated shared Drive folder.
+    * Update translator and coordinator on Teams.
+    * Update personal monitoring log.
+* Side processes
+    * Monitor shared Drive folders for uploaded files from translator, in case translator fails to update on Teams.
+    * Monitor Teams for announcements (extra work, general notice, updated guidelines, and the like).
 
 ## Future development
 
@@ -46,8 +68,8 @@ As I see it, when all the component have been recreated includes :
 
 ## Directory
 
-1. [x] **mod_01.py** (PDF Comments Scraper) - creates a CSV file containing all the comments in the PDF file. CSV file is
-  used in pasting the comments to respective PSD files.
+1. [x] **mod_01.py** (PDF Comments Scraper) - creates a CSV file containing all the comments in the PDF file. CSV file
+   is used in pasting the comments to respective PSD files.
 2. [ ] **mod_02.jsx** (CSV to PSD) - transfers the contents of the CSV file to corresponding PSD files.
 3. [x] **mod_03.py** (Revisions) - mark PSD files that needs to be edited, rename parent folder.
 4. [x] **mod_04.py** (Rename Files) - append/remove page markers to/from PSD filenames: ##x, ##
