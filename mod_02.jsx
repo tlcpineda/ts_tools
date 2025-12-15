@@ -130,7 +130,7 @@ function parse_csv(csv_str) {
         var replacement_arr = [
             ['""', '"'],
             ['<>', '\r'],
-            ['\\.\\.', '...']
+            ['(?<!\\.)\\.\\.(?!\\.)', '...']
         ]
 
         var line = lines_split.slice(0, 5);
