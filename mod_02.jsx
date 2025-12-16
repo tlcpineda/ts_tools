@@ -130,7 +130,8 @@ function parse_csv(csv_str) {
         var replacement_arr = [
             ['""', '"'],
             ['<>', '\r'],
-            ['(?<!\\.)\\.\\.(?!\\.)', '...']
+            ['(?<!\\.)(\\.\\.|\\.{4,})(?!\\.)', '...'],  // Replace two dots, or 4 or more dots by  proper ellipsis.
+            ['(!+)(\\?+)', '$2$1']  // Interchange position of marks.
         ]
 
         var line = lines_split.slice(0, 5);
