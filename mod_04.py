@@ -10,6 +10,7 @@ mod_name = "Rename PSD Files"
 mod_ver = "1"
 date = "14 Dec 2025"
 email = "tlcpineda.projects@gmail.com"
+# Consider appending target language ???
 
 def rename_files(folder_path: str) -> None:
     """
