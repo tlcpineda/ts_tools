@@ -18,7 +18,8 @@ mod_name = "PDF Comments Scraper"
 mod_ver = "2"
 date = "10 Dec 2025"
 email = "tlcpineda.projects@gmail.com"
-csv_name = "translations.csv"   # The filename of the output CSV file
+# csv_name = "translations.csv"   # The filename of the output CSV file
+csv_name = "translations mod_01-transform.csv"   # The filename of the output CSV file
 textbox_dim_dst = [dim * 72 for dim in [1.25, 1.75]] # width x height in inches; converted to points.
 psd_folder = "2 TYPESETTING"
 
@@ -60,11 +61,6 @@ def process_file(filepath: str) -> None:
     print(f"\n<=> RTL sort order will{" " if rtl else " not "}be applied.")
 
     try:
-        # TODO insert method to mutate PDF coordinates to match PSD dimensions.
-        # Fetch dimensions of PSD files in psd_folder.
-        display_path_desc(os.path.join(dirname, psd_folder), "folder")
-        psd_props = fetch_psd_props(os.path.join(dirname, psd_folder))
-
         doc = fitz.open(filepath)
         col_size = [6, 10]
 
@@ -75,42 +71,32 @@ def process_file(filepath: str) -> None:
             page_comments = []
             page_num = page_index + 1
             page_marker = f"{page_num:02}X"
-            psd_dim = psd_props[page_marker]['dim']
 
-            # TODO Determine transformation parameters PDF to PSD
-            page_rect = page.rect
+            # Get the transformation matrix used in embedding the image onto the page.
+            img_props = fetch_img_props(page)
+            w, h, x_off, y_off = img_props['width'], img_props['height'], img_props['x_off'], img_props['y_off']
 
-            print(page_rect) # branch
+            page_rect = page.rect   # From PDF page
             page_width, page_height = page_rect.width, page_rect.height
-            (x_off, y_off, width_adj, height_adj) = transforms(psd_dim, page.rect)
-
             types = [0, 2]  # PDF_ANNOT_TEXT, PDF_ANNOT_FREE_TEXT
             annots = list(page.annots(types=types))
-
-            # norm_dim = lambda a0, a: (a0 / a)
-            norm_dim = lambda box_dim, dim_dst: (box_dim[0] / dim_dst[0], box_dim[1] / dim_dst[1])
+            norm_dim = lambda dim, dim1: (dim[0] / dim1[0], dim[1] / dim1[1])
 
             for annot in annots:
-                annot_rect = annot.rect
-                # x0_norm = annot_rect.x0 / page_width
-                # y0_norm = annot_rect.y0 / page_height
-
-                x0_norm, y0_norm = norm_dim( (annot_rect.x0, annot_rect.y0), psd_dim)
-
-                # Normalise dimensions of textbox.
-                # w_norm, h_norm = norm_dim(textbox_dim_dst[0], page_width), norm_dim(textbox_dim_dst[1], page_height)
-                w_norm, h_norm = norm_dim(textbox_dim_dst, psd_dim)
-
-
+                annot_tl = annot.rect.top_left
+                x0, y0 = annot_tl.transform(fitz.Matrix(w / page_width, 0, 0, h / page_height, -x_off, -y_off))
+                x0_norm, y0_norm = norm_dim((x0, y0), (w, h))
+                w_norm, h_norm = norm_dim(textbox_dim_dst, (w, h))
                 comment = clean_up(annot.info['content'])
+                clamp = lambda dim: max(0.01, min(dim, 0.99))   # Ensure that value is in [0.01, 0.99]; 1% easement
 
                 page_comments.append([
                     page_marker,
-                    x0_norm,
-                    y0_norm,
+                    clamp(x0_norm),
+                    clamp(y0_norm),
                     int(round(y0_norm / 0.05, 2)),    # bin, used in sorting vertically.
-                    f"{w_norm:.6f}",
-                    f"{h_norm:.6f}",
+                    f"{w_norm:g}",
+                    f"{h_norm:g}",
                     comment
                 ])
 
@@ -119,7 +105,7 @@ def process_file(filepath: str) -> None:
             print(f"<=> | {page_num:>{col_size[0]}} | {len(annots) or "-":>{col_size[1]}} |")
 
         doc.close()
-        # write_to_csv(dirname, [header] + data_rows)
+        write_to_csv(dirname, [header] + data_rows)
 
     except Exception as e:
         display_message(
@@ -167,8 +153,8 @@ def sort_rtl(page_data: list, rtl: bool) -> list:
     """
     sorted_data = sorted(page_data, key=lambda x: ( -x[3], x[1] * rtl))
 
-    # Remove "bin" (index 3)), and truncate x0, y0 to 6 decimal places.
-    return list(map(lambda x: [x[0], f"{x[1]:6f}", f"{x[2]:6f}"] + x[4:], sorted_data))
+    # Remove "bin" (index 3)), and truncate x0, y0 to (at most) 6 decimal places.
+    return list(map(lambda x: [x[0], f"{x[1]:g}", f"{x[2]:g}"] + x[4:], sorted_data))
 
 
 def write_to_csv(directory: str, data: list) -> None:
@@ -233,25 +219,44 @@ def fetch_psd_props(psd_dir: str) -> dict:
     return properties
 
 
-def transforms(psd_dim: tuple, pdf_rect: fitz.Rect) -> tuple:
-    """
+def fetch_img_props(page: fitz.Page) -> dict | None:
+    img_list = page.get_images(full=True)
 
-    :param psd_dim:
-    :param pdf_rect:
-    :return:
-    """
-    w_src, h_src = pdf_rect.width, pdf_rect.height
-    w_dst, h_dst = psd_dim
-    x_off, y_off = (w_dst - w_src) / 2, (h_dst - h_src) / 2
-    # width, height = convert(w_dst, h_dst) # Convert PSD dimensions (pixels) to PDF dimensions (points)
+    if img_list:
+        # Get the image with the maximum area.
+        img = max(img_list, key=lambda image: image[2] * image[3])
 
-    return (x_off, y_off, width, height)
+        bbox, matrix = page.get_image_rects(img[0], transform=True)[0]
+
+        """
+        Matrix of the image; to be used in processing the coordinates of the comments.
+        Elements of the matrix: Matrix(a, b, c, d, e, f)
+            a - scaling in x-direction, width of the bbox
+            b - 0 value expected; no shearing along y-direction
+            c - 0 value expected; no shearing along x-direction
+            d - scaling in y-direction, height of the bbox
+            e - horizontal translation
+            f - vertical translation
+        """
+        img_width, b, c, img_height, x_off, y_off = matrix
+
+        return {
+            'width': img_width,
+            'height': img_height,
+            'x_off': x_off,
+            'y_off': y_off,
+        }
+
+    else:
+        display_message(
+            "ERROR",
+            "No image found on page."
+        )
+
+        return None
 
 
 if __name__ == '__main__':
-    # d = r"C:\Users\Tristan Louie Pineda\Documents\ทำงาน\CCCI\2 PROJECTS\2025-Q3-KH-B2-12 Astra Lost in Space\CH49\2 TYPESETTING"
-    # fetch_psd_props(d)
-
     welcome_sequence([
         mod_name,
         f"ver {mod_ver} {date}",
