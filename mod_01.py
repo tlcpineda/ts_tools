@@ -15,7 +15,7 @@ from lib import welcome_sequence, identify_path, display_path_desc, continue_seq
 
 # Module variables
 mod_name = "PDF Comments Scraper"
-mod_ver = "1"
+mod_ver = "2"
 date = "10 Dec 2025"
 email = "tlcpineda.projects@gmail.com"
 csv_name = "translations.csv"   # The filename of the output CSV file
@@ -80,7 +80,7 @@ def process_file(filepath: str) -> None:
             # TODO Determine transformation parameters PDF to PSD
             page_rect = page.rect
 
-            print(page_rect)
+            print(page_rect) # branch
             page_width, page_height = page_rect.width, page_rect.height
             (x_off, y_off, width_adj, height_adj) = transforms(psd_dim, page.rect)
 
