@@ -239,6 +239,6 @@ main(
     ["action_name1", "action_set1"],    // Main text font style for the language
     ["action_name2", "action_set2"],    // Language setting.
 ],
-    1.0
+    1.0 // Change according to visual estimate.
 );
 
