@@ -6,8 +6,9 @@
  * @author tlcpineda.projects@gmail.com
  * @description Transfer the contents of the CSV file to corresponding PSD files, ready for manual adjustments.
  * @param {Array} action_arr A 2D array describing the actions to be applied to the text layers. This is chapter- and language-sensitive.
+ * @param {number} gen_scale Title-specific scale ratio, to compensate conversion from PSD to PDF (prior to writing comments): [0, 1) indicate a shrinkage; and [1, ) indicate a  dilation.
  */
-function main(action_arr) {
+function main(action_arr, gen_scale) {
     var doc_units = toggle_doc_units();
 
     var doc = app.activeDocument;
@@ -53,7 +54,14 @@ function main(action_arr) {
     for (var j=0; j<doc_data.length; j++) {
         var row = doc_data[j];
 
-        transfer_text(doc, row[1], row[2], row[3], row[4], row[5]);
+        transfer_text(
+            doc,
+            row[1] * gen_scale,
+            row[2] * gen_scale,
+            row[3] * gen_scale,
+            row[4] * gen_scale,
+            row[5]
+        );
     }
 
     // Apply actions only if defined.
@@ -225,9 +233,12 @@ function apply_actions_to_text_layers(doc, action_arr) {
 
 
 // Run the main function.
-main([
+main(
+[
     // Consider recording a single action for Main+Language, to minimise run time.
     ["action_name1", "action_set1"],    // Main text font style for the language
     ["action_name2", "action_set2"],    // Language setting.
-]);
+],
+    1.0
+);
 

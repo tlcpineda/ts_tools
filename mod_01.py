@@ -16,10 +16,9 @@ from lib import welcome_sequence, identify_path, display_path_desc, continue_seq
 # Module variables
 mod_name = "PDF Comments Scraper"
 mod_ver = "2"
-date = "10 Dec 2025"
+date = "18 Dec 2025"
 email = "tlcpineda.projects@gmail.com"
-# csv_name = "translations.csv"   # The filename of the output CSV file
-csv_name = "translations mod_01-transform.csv"   # The filename of the output CSV file
+csv_name = "translations.csv"   # The filename of the output CSV file
 textbox_dim_dst = [dim * 72 for dim in [1.25, 1.75]] # width x height in inches; converted to points.
 psd_folder = "2 TYPESETTING"
 
@@ -181,42 +180,6 @@ def write_to_csv(directory: str, data: list) -> None:
             f"Error writing to CSV file {csv_name}.",
             f"{e}"
         )
-
-
-def fetch_psd_props(psd_dir: str) -> dict:
-    """
-    Retrieve the width and height, in pixels, of the working PSD files.
-    :param psd_dir: Path containing the working PSD files.
-    :return properties: Dictionary with key as the page maker ("##X"), and values as a dictionary {dim, res};
-     dim (width, height), and res (x_res, y_res) of the working PSD files.
-    """
-    print(f"\n<=> Fetching PSD Dimensions ...")
-
-    properties = {}
-
-    for file in os.listdir(psd_dir):
-        if file.lower().endswith(".psd"):
-            psd_path = os.path.join(psd_dir, file)
-            filename = os.path.splitext(file)[0]
-
-            try:
-                with Image.open(psd_path) as img:
-                    dpi = img.info.get('dpi', (72, 72))
-                    size = img.size # img.size is a tuple: (width, height)
-                    properties[f"{filename.split(" ")[1]}"] = {'dim': size, 'res': dpi}
-
-                    print(f"<=> {file} :\n"
-                          f"<=>  Dimensions : {size} px\n"
-                          f"<=>  Resolution : {dpi} dpi")
-
-            except Exception as e:
-                display_message(
-                    "ERROR",
-                    "fCould not read {file}",
-                    f"{e}"
-                )
-
-    return properties
 
 
 def fetch_img_props(page: fitz.Page) -> dict | None:
