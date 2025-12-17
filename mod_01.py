@@ -9,6 +9,7 @@ Saves each comment in a CSV file with the following parameters :
 import csv
 import os
 import fitz
+from PIL import Image
 
 from lib import welcome_sequence, identify_path, display_path_desc, continue_sequence, display_message
 
@@ -18,6 +19,8 @@ mod_ver = "1"
 date = "10 Dec 2025"
 email = "tlcpineda.projects@gmail.com"
 csv_name = "translations.csv"   # The filename of the output CSV file
+textbox_dim_dst = [dim * 72 for dim in [1.25, 1.75]] # width x height in inches; converted to points.
+psd_folder = "2 TYPESETTING"
 
 def process_file(filepath: str) -> None:
     """
@@ -57,32 +60,52 @@ def process_file(filepath: str) -> None:
     print(f"\n<=> RTL sort order will{" " if rtl else " not "}be applied.")
 
     try:
+        # TODO insert method to mutate PDF coordinates to match PSD dimensions.
+        # Fetch dimensions of PSD files in psd_folder.
+        display_path_desc(os.path.join(dirname, psd_folder), "folder")
+        psd_props = fetch_psd_props(os.path.join(dirname, psd_folder))
+
         doc = fitz.open(filepath)
         col_size = [6, 10]
 
-        print("\n<=> Summary :")
+        print(f"\n<=> Summary of Retrieved Comments :")
         print(f"<=> | {"Page":>{col_size[0]}} | {"Comments":>{col_size[1]}} |")
 
-
-        for page_index, page in enumerate(doc):
+        for page_index, page in enumerate(doc.pages()):
             page_comments = []
             page_num = page_index + 1
+            page_marker = f"{page_num:02}X"
+            psd_dim = psd_props[page_marker]['dim']
+
+            # TODO Determine transformation parameters PDF to PSD
             page_rect = page.rect
+
+            print(page_rect)
             page_width, page_height = page_rect.width, page_rect.height
-            # TODO insert method to mutate PDF coordinates to match PSD dimensions.
+            (x_off, y_off, width_adj, height_adj) = transforms(psd_dim, page.rect)
+
             types = [0, 2]  # PDF_ANNOT_TEXT, PDF_ANNOT_FREE_TEXT
             annots = list(page.annots(types=types))
 
+            # norm_dim = lambda a0, a: (a0 / a)
+            norm_dim = lambda box_dim, dim_dst: (box_dim[0] / dim_dst[0], box_dim[1] / dim_dst[1])
+
             for annot in annots:
                 annot_rect = annot.rect
-                x0_norm = annot_rect.x0 / page_width
-                y0_norm = annot_rect.y0 / page_height
-                w_norm = 1.25 * 72 / page_width # Inches to points conversion before normalisation
-                h_norm = 1.75 * 72 / page_height
+                # x0_norm = annot_rect.x0 / page_width
+                # y0_norm = annot_rect.y0 / page_height
+
+                x0_norm, y0_norm = norm_dim( (annot_rect.x0, annot_rect.y0), psd_dim)
+
+                # Normalise dimensions of textbox.
+                # w_norm, h_norm = norm_dim(textbox_dim_dst[0], page_width), norm_dim(textbox_dim_dst[1], page_height)
+                w_norm, h_norm = norm_dim(textbox_dim_dst, psd_dim)
+
+
                 comment = clean_up(annot.info['content'])
 
                 page_comments.append([
-                    f"{page_num:02}X",
+                    page_marker,
                     x0_norm,
                     y0_norm,
                     int(round(y0_norm / 0.05, 2)),    # bin, used in sorting vertically.
@@ -96,7 +119,7 @@ def process_file(filepath: str) -> None:
             print(f"<=> | {page_num:>{col_size[0]}} | {len(annots) or "-":>{col_size[1]}} |")
 
         doc.close()
-        write_to_csv(dirname, [header] + data_rows)
+        # write_to_csv(dirname, [header] + data_rows)
 
     except Exception as e:
         display_message(
@@ -174,7 +197,61 @@ def write_to_csv(directory: str, data: list) -> None:
         )
 
 
+def fetch_psd_props(psd_dir: str) -> dict:
+    """
+    Retrieve the width and height, in pixels, of the working PSD files.
+    :param psd_dir: Path containing the working PSD files.
+    :return properties: Dictionary with key as the page maker ("##X"), and values as a dictionary {dim, res};
+     dim (width, height), and res (x_res, y_res) of the working PSD files.
+    """
+    print(f"\n<=> Fetching PSD Dimensions ...")
+
+    properties = {}
+
+    for file in os.listdir(psd_dir):
+        if file.lower().endswith(".psd"):
+            psd_path = os.path.join(psd_dir, file)
+            filename = os.path.splitext(file)[0]
+
+            try:
+                with Image.open(psd_path) as img:
+                    dpi = img.info.get('dpi', (72, 72))
+                    size = img.size # img.size is a tuple: (width, height)
+                    properties[f"{filename.split(" ")[1]}"] = {'dim': size, 'res': dpi}
+
+                    print(f"<=> {file} :\n"
+                          f"<=>  Dimensions : {size} px\n"
+                          f"<=>  Resolution : {dpi} dpi")
+
+            except Exception as e:
+                display_message(
+                    "ERROR",
+                    "fCould not read {file}",
+                    f"{e}"
+                )
+
+    return properties
+
+
+def transforms(psd_dim: tuple, pdf_rect: fitz.Rect) -> tuple:
+    """
+
+    :param psd_dim:
+    :param pdf_rect:
+    :return:
+    """
+    w_src, h_src = pdf_rect.width, pdf_rect.height
+    w_dst, h_dst = psd_dim
+    x_off, y_off = (w_dst - w_src) / 2, (h_dst - h_src) / 2
+    # width, height = convert(w_dst, h_dst) # Convert PSD dimensions (pixels) to PDF dimensions (points)
+
+    return (x_off, y_off, width, height)
+
+
 if __name__ == '__main__':
+    # d = r"C:\Users\Tristan Louie Pineda\Documents\ทำงาน\CCCI\2 PROJECTS\2025-Q3-KH-B2-12 Astra Lost in Space\CH49\2 TYPESETTING"
+    # fetch_psd_props(d)
+
     welcome_sequence([
         mod_name,
         f"ver {mod_ver} {date}",
