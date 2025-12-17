@@ -74,6 +74,7 @@ As I see it, when all the component have been recreated includes :
 3. [x] **mod_03.py** (Revisions) - mark PSD files that needs to be edited, rename parent folder.
 4. [x] **mod_04.py** (Rename Files) - append/remove page markers to/from PSD filenames: ##x, ##
 5. [ ] **mod_05.py** (Prepare Folders) - fetch clean working files, and create chapter folder/s under title/language
+6. [ ] **mod_06.py** (Compile PSD to PDF) - convert *{Typeset PSD Files}* to *{Typset.PDF}* ready from submission. 
 
 ## Project Tags (Personal)
 
