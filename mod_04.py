@@ -39,6 +39,7 @@ def rename_files(folder_path: str) -> None:
     print(f"\n<=> Page markers to be {"appended to" if method == "A" else "removed from"} PSD files.")
 
     process_pathname(method_case[method], folder_path)
+    # TODO try-catch block; display-message after run
 
 
 if __name__ == '__main__':
