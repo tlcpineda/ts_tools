@@ -125,14 +125,6 @@ def gen_out_filepath(folder_path: str) -> str:
 
 if __name__ == "__main__":
     # module_06_psd_to_pdf_streaming("./chapter_folder", "QA_Reference_72dpi.pdf")
-
-    psd_folder = r"...\2 PROJECTS\2025-Q4-KH-B5-34 Captain Tsubasa\CH4\2 TYPESETTING"
-
-    # title = "Captain_Tsubasa_Khmer CH_2_For TP Check.pdf"
-    # folder = input("Enter the folder containing PSD files: ")
-    # compile_to_pdf(folder, out_pdf)
-    compile_to_pdf(psd_folder)
-
     # gen_out_filepath(psd_folder)
 
     while False:
