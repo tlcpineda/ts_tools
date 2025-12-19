@@ -39,11 +39,11 @@ def identify_path(base_type: str) -> str:
 
 def display_path_desc(filepath: str, base_type: str) -> tuple:
     parent_name, base_name = os.path.split(filepath)
-    split_parent_name = parent_name.split("/")
+    split_parent_name = parent_name.split("/") if "/" in parent_name else parent_name.split("\\")
     num_levels = 3
     process_dirname = parent_name if len(split_parent_name) <= num_levels else f".../{"/".join(split_parent_name[-3:])}"
 
-    print(f"\n<=> Processing {base_type} :"
+    print(f"\n<=> {base_type.title()} Details :"
           f"\n<=>  Directory : {process_dirname}"
           f"\n<=>  Base Name : {base_name}")
 
