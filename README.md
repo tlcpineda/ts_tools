@@ -82,10 +82,11 @@ two destination languages for the same title.
         * `{nn}x` or `{nn}X` - during typesetting or revisions; 2 digit page number (last 2 digits of `{page}`), with
           literal "x" or "X";
         * `{nn}` - after typesetting;
-* {Typeset}.pdf - `{Title} CH {chapter}_{mark}`
-  * `{Title}` - to official English title of the project with proper capitalisation;
-  * `{chapter}` - the chapter number; at least 1 digit; and,
-  * `{mark}` - marker indicating file is for review; client-specified.
+* {Typeset}.pdf - `{Title}_{lang} CH {chapter}_{mark}`
+    * `{Title}` - to official English title of the project with proper capitalisation;
+    * `{lang}` - the typesetting language;
+    * `{chapter}` - the chapter number; at least 1 digit; and,
+    * `{mark}` - marker indicating file is for review; client-specified.
 
 **Processing**
 
@@ -131,6 +132,8 @@ As I see it, when all the component have been recreated includes :
 4. [x] **mod_04.py** (Rename Files) - append/remove page markers to/from PSD filenames: ##x, ##
 5. [ ] **mod_05.py** (Prepare Folders) - fetch clean working files, and create chapter folder/s under title/language
 6. [ ] **mod_06.py** (Compile PSD to PDF) - convert *{Typeset PSD Files}* to *{Typeset}.pdf* ready from submission.
+7. [ ] **mod_##.py** (Translate JP) - small database of Japanese text (often SFX), and matching localisations; requires
+   handwritten input.
 
 ## Project Tags (Personal)
 
