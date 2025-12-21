@@ -31,6 +31,62 @@ two destination languages for the same title.
     * *Typeset PSD Files* - (by chapter-language) multiple PSD files for the chapter; for submission to QA, then to
       client.
 
+**Local Directory Structure**
+
+```
++- PROJECTS
+   +- Title Code 1
+   |  +- CH1
+   |  |  +- 6 FINAL PSD
+   |  |  |  +- PSD001.psd
+   |  |  |  +- PSD002.psd
+   |  |  |  :
+   |  |  |  :
+   |  |  |  +- PSDmmm.psd
+   |  |  +- {Translations}.pdf
+   |  |  +- translations.csv
+   |  |  +- {Typeset}.pdf
+   |  |  +- {Review}.pdf
+   |  +- CH2
+   |  |  +- 2 TYPESETTING
+   |  |  |  +- PSD001 01x.psd
+   |  |  |  +- PSD002 02X.psd
+   |  |  |  :
+   |  |  |  :
+   |  |  |  +- PSDmmm mmX.psd
+   |  |  +- {Translations}.pdf
+   |  |  +- translations.csv
+   |  |  +- {Typeset}.pdf
+   |  :
+   |  :
+   |  +- CHk
+   :
+   : 
+   +- Title Code n
+```
+
+* Title Code - `{year}-Q{quarter}-{lang_code}-B{batch_num}_{title_num} {Title}`
+    * `{year}` - current year when title was assigned; 4 digits;
+    * `{quarter}` - current quarter of the year when title was assigned; 1 digit;
+    * `{lang_code}` - ISO language code; 2 characters;
+    * `{batch_num}` - project batch number; client-specified; currently 1 digit;
+    * `{title_num}` - title number; client-specified; currently at most 2 digits; and,
+    * `{Title}` - the official English title of the project.
+* Working PSD File - `{TitleName}_{volume}_{chapter}_{page} {page_marker}.psd`
+    * `{TileName}` - the official English title of the project in Pascal case;
+    * `{volume}` - the volume number; 3 digits;
+    * `{chapter}` - the chapter number; 4 digits;
+    * `{page}` - the page number; 3 digits; and,
+    * `{page_marker}` - depends on stage of processing:
+        * `null` - during pre-processing, after revisions and prior to upload to shared project Drive folder;
+        * `{nn}x` or `{nn}X` - during typesetting or revisions; 2 digit page number (last 2 digits of `{page}`), with
+          literal "x" or "X";
+        * `{nn}` - after typesetting;
+* {Typeset}.pdf - `{Title} CH {chapter}_{mark}`
+  * `{Title}` - to official English title of the project with proper capitalisation;
+  * `{chapter}` - the chapter number; at least 1 digit; and,
+  * `{mark}` - marker indicating file is for review; client-specified.
+
 **Processing**
 
 * Initial
@@ -74,7 +130,7 @@ As I see it, when all the component have been recreated includes :
 3. [x] **mod_03.py** (Revisions) - mark PSD files that needs to be edited, rename parent folder.
 4. [x] **mod_04.py** (Rename Files) - append/remove page markers to/from PSD filenames: ##x, ##
 5. [ ] **mod_05.py** (Prepare Folders) - fetch clean working files, and create chapter folder/s under title/language
-6. [ ] **mod_06.py** (Compile PSD to PDF) - convert *{Typeset PSD Files}* to *{Typset.PDF}* ready from submission. 
+6. [ ] **mod_06.py** (Compile PSD to PDF) - convert *{Typeset PSD Files}* to *{Typeset}.pdf* ready from submission.
 
 ## Project Tags (Personal)
 
