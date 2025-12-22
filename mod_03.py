@@ -34,10 +34,10 @@ def process_rev_file(filepath: str) -> None:
 
         pages_marked = []
 
-        for page_index, page in enumerate(doc):
+        for page_index, page in enumerate(doc.pages()):
             page_num = page_index + 1
 
-            # Select all pages with at least one annotation (usually of type [0, 2, 13).
+            # Select all pages with at least one annotation (usually of type [0-TEXT, 2-FREE_TEXT, 13-STAMP).
             annots = list(page.annots())
 
             if len(annots)>0: pages_marked.append(f"{page_num:02}")
@@ -59,11 +59,18 @@ def process_rev_file(filepath: str) -> None:
         folder1 = os.path.join(dirname, folder_name1)
 
         if folder0 != folder1:
-            rename_path(folder0, folder1, "folder")
+            # Check if folder1 already exists.
+            if os.path.exists(folder1):
+                display_message(
+                    "ERROR",
+                    "New folder name is already assigned."
+                )
+            else:
+                rename_path(folder0, folder1, "folder")
         else:
             display_message(
                 "ERROR",
-                "Cannot rename folder."
+                "New folder name is the same as old name."
             )
 
     except Exception as e:
@@ -93,12 +100,5 @@ if __name__ == '__main__':
         if path: process_rev_file(path)
         else: print("\n<=> No file selected.")
 
-        if continue_sequence() == "X":
-            confirm_exit = True
-
-            print("\n<=> Closing down ...")
-        else:
-            confirm_exit = False
-
-            print("\n<=> Restarting ...")
+        confirm_exit =  continue_sequence()
 
