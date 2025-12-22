@@ -10,7 +10,7 @@ mod_name = "Rename PSD Files"
 mod_ver = "1"
 date = "14 Dec 2025"
 email = "tlcpineda.projects@gmail.com"
-# Consider appending target language ???
+# FUTURE Prefix language code to filename.
 
 def rename_files(folder_path: str) -> None:
     """
@@ -20,15 +20,22 @@ def rename_files(folder_path: str) -> None:
     """
     parent, base = display_path_desc(folder_path, "folder")
 
-    # User input whether to append or remove page markers.
-    print(f"\n>>> Select an option to rename files ...")
+    if not os.listdir(folder_path):
+        display_message(
+            "ERROR",
+            f"Folder \"{base}\" is empty."
+        )
+
+        return
+
+    print(f"\n>>> Select an option to rename files ...")    # User input whether to append or remove page markers.
 
     method = None
 
     while method is None:
         print(">>>  [A]ppend page markers (##X).")  # process_pathname case 1
         print(">>>  [R]emove page markers (##X, ##).") # process_pathname case 3
-        method = input(">>>  ").upper()
+        method = input(">>> ").upper()
 
         if method not in ["A", "R"]:
             method = None
@@ -38,8 +45,19 @@ def rename_files(folder_path: str) -> None:
 
     print(f"\n<=> Page markers to be {"appended to" if method == "A" else "removed from"} PSD files.")
 
-    process_pathname(method_case[method], folder_path)
-    # TODO try-catch block; display-message after run
+    try:
+        process_pathname(method_case[method], folder_path)
+        display_message(
+            "SUCCESS",
+            f"Page markers {"appended to" if method == "A" else "removed from"} PSD files."
+        )
+
+    except Exception as e:
+        display_message(
+            "ERROR",
+            "File renaming failed.",
+            f"{e}"
+        )
 
 
 if __name__ == '__main__':
@@ -59,14 +77,7 @@ if __name__ == '__main__':
         path = identify_path("folder")
 
         if path: rename_files(path)
-        else: print("\n<=> No file selected.")
+        else: print("\n<=> No folder selected.")
 
-        if continue_sequence() == "X":
-            confirm_exit = True
-
-            print("\n<=> Closing down ...")
-        else:
-            confirm_exit = False
-
-            print("\n<=> Restarting ...")
+        confirm_exit =  continue_sequence()
 
