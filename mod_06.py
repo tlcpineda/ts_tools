@@ -3,11 +3,8 @@ Compile PSD files contained in the selected folder into a single PDF file.
 PDF filename is parsed from the parent directory of the files.
 """
 import os
-from operator import not_
 
 from PIL import Image
-from PIL.ImageSequence import Iterator
-
 from lib import welcome_sequence, identify_path, display_path_desc, continue_sequence, display_message
 
 # Module variables
@@ -19,10 +16,12 @@ psd_folder = "2 TYPESETTING"
 lang_dict = {
     'kh': 'Khmer',
     'hi': 'Hindi'
-}   # FUTURE To be harmonised with work title codes:  etc "2025-Q4-KH-B5-34", "2025-Q4-HI-B2-12", and title log.
+}   # FUTURE To be harmonised with title codes:  etc "2025-Q4-KH-B5-34", "2025-Q4-HI-B2-12", and title log.
 filename_pattern = '{TitleName_vol[3]_chap[4]_pg[3] pg[2]}.psd' or '{TitleName_vol[3]_chap[4]_pg[3] pg[2]}X.psd'
 
 def compile_to_pdf(input_folder):
+    input_folder = os.path.normpath(input_folder)   # Normalise path.
+
     # Get and sort PSD files from folder; only files that follow filename pattern.
     files = filter_files(input_folder)
 
@@ -79,9 +78,11 @@ def filter_files(folder: str) -> list:
 
     for f  in os.listdir(folder):
         # Check if filename follows filename pattern.
-        if ' ' in f:# Append file to return list if page_marker exists.
+        ext = os.path.splitext(f)[1]
+
+        if ' ' in f and ext.lower() == '.psd':  # Append file to return list if page_marker exists.
             page = get_pg_num(f)
-            if page: filtered_files.append(f)
+            if page != 999: filtered_files.append(f)
 
     return filtered_files
 
@@ -98,7 +99,7 @@ def get_pg_num(filename: str) -> int:
     return int(pg_str) if pg_str else 999 # Return an absurdly large number if pg_str is null string.
 
 
-def image_generator(folder: str, files: list) -> Iterator:
+def image_generator(folder: str, files: list):
     """
     Opens, converts, and yields one image at a time to save memory.
     :param folder: The parent folder of the PSD file
@@ -107,6 +108,7 @@ def image_generator(folder: str, files: list) -> Iterator:
     """
     for filename in files:
         filepath = os.path.join(folder, filename)
+
         try:
             with Image.open(filepath) as img:
                 display_message(
@@ -131,7 +133,7 @@ def gen_out_filepath(folder_path: str) -> str:
     :return: The PDF path where the images will be converted to
     """
     parent = os.path.dirname(folder_path)
-    title_folder, ch_folder = parent.split("/")[-2:]
+    title_folder, ch_folder = parent.split(os.sep)[-2:]
     title_split = title_folder.split(" ")
     lang_iso = title_split[0].split('-')[2].lower()
     ch_num = ch_folder.replace('CH', '')
