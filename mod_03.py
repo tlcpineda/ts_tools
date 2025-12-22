@@ -17,16 +17,17 @@ email = "tlcpineda.projects@gmail.com"
 folder_name0 = "2 TYPESETTING"
 folder_name1 = "6 FINAL PSD"
 
-def process_rev_file(filepath: str) -> None:
+def process_rev_file(input_path: str) -> None:
     """
     Create a list of pages with comments, or markings, for revisions.
-    :param filepath: The path pointing to the PDF file marked with revisions
+    :param input_path: The path pointing to the PDF file marked with revisions
     :return:
     """
-    dirname, filename = display_path_desc(filepath, "file")
+    input_path = os.path.normpath(input_path)  # Normalise path.
+    dirname, filename = display_path_desc(input_path, "file")
 
     try:
-        doc = fitz.open(filepath)
+        doc = fitz.open(input_path)
         col_size = [6, 10]
 
         print("\n<=> Summary :")
