@@ -164,17 +164,8 @@ if __name__ == "__main__":
 
         path = identify_path("folder")
 
-        if path:
-            compile_to_pdf(path)
-        else:
-            print("\n<=> No folder selected.")
+        if path: compile_to_pdf(path)
+        else: print("\n<=> No folder selected.")
 
-        if continue_sequence() == "X":
-            confirm_exit = True
-
-            print("\n<=> Closing down ...")
-        else:
-            confirm_exit = False
-
-            print("\n<=> Restarting ...")
+        confirm_exit =  continue_sequence()
 
