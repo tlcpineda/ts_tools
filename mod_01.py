@@ -21,13 +21,14 @@ csv_name = "translations.csv"   # The filename of the output CSV file
 textbox_dim_dst = [dim * 72 for dim in [1.25, 1.75]] # width x height in inches; converted to points.
 psd_folder = "2 TYPESETTING"
 
-def process_file(filepath: str) -> None:
+def process_file(input_path: str) -> None:
     """
     Scrape PDF file for comments.
-    :param filepath: The file path of the PDF file
+    :param input_path: The file path of the PDF file
     :return:
     """
-    dirname, filename = display_path_desc(filepath, "file")
+    input_path = os.path.normpath(input_path)  # Normalise path.
+    dirname, filename = display_path_desc(input_path, "file")
 
     header = [
         "page_num",
@@ -59,7 +60,7 @@ def process_file(filepath: str) -> None:
     print(f"\n<=> RTL sort order will{" " if rtl else " not "}be applied.")
 
     try:
-        doc = fitz.open(filepath)
+        doc = fitz.open(input_path)
         col_size = [6, 10]
 
         print(f"\n<=> Summary of Retrieved Comments :")
