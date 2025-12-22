@@ -20,8 +20,8 @@ lang_dict = {
 filename_pattern = '{TitleName_vol[3]_chap[4]_pg[3] pg[2]}.psd' or '{TitleName_vol[3]_chap[4]_pg[3] pg[2]}X.psd'
 
 def compile_to_pdf(input_folder):
-    display_path_desc(input_folder, 'folder')
     input_folder = os.path.normpath(input_folder)   # Normalise path.
+    display_path_desc(input_folder, 'folder')
 
     # Get and sort PSD files from folder; only files that follow filename pattern.
     files = filter_files(input_folder)
