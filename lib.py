@@ -1,6 +1,5 @@
 import os
 import tkinter as tk
-from os.path import basename
 from tkinter import filedialog as fd
 
 def welcome_sequence(items: list):
@@ -39,7 +38,7 @@ def identify_path(base_type: str) -> str:
 
 def display_path_desc(filepath: str, base_type: str) -> tuple:
     parent_name, base_name = os.path.split(filepath)
-    split_parent_name = parent_name.split("/") if "/" in parent_name else parent_name.split("\\")
+    split_parent_name = parent_name.split(os.sep)
     num_levels = 3
     process_dirname = parent_name if len(split_parent_name) <= num_levels else f".../{"/".join(split_parent_name[-3:])}"
 
@@ -50,7 +49,7 @@ def display_path_desc(filepath: str, base_type: str) -> tuple:
     return parent_name, base_name
 
 
-def continue_sequence() -> str:
+def continue_sequence() -> bool:
     proper_resp = False
     resp = "C"
 
@@ -61,9 +60,16 @@ def continue_sequence() -> str:
 
         resp = input(">>> ").upper()
 
-        proper_resp = True if resp in ["C", "X"] else False
+        proper_resp = True if resp in ['C', 'X'] else False
 
-    return resp
+    if resp == 'X':
+        print("\n<=> Closing down ...")
+
+        return True
+    else:
+        print("\n<=> Restarting ...\n")
+
+        return False
 
 
 def display_message(tag: str, message: str, exception: str=None) -> None:
@@ -88,14 +94,13 @@ def process_pathname(case_num: int, base_path: str, target: str="", data: list=N
             f"{item} ..."
         )
 
-        if ext==".psd": # Process only PSD files
+        if ext.lower()==".psd": # Process only PSD files
             path0 = os.path.join(psd_path, item)
 
             if os.path.isfile(path0):
 
                 match case_num:
-                    # 1 Initial case when appending page markers ("##X") to original file name.
-                    case 1:
+                    case 1: # Initial case when appending page markers ("##X") to original file name.
                         page_num = filename[-2:]
 
                         if page_num.isdigit():
@@ -114,8 +119,7 @@ def process_pathname(case_num: int, base_path: str, target: str="", data: list=N
                                 "Not a valid file path."
                             )
 
-                    # 2 Case when marking files for revision, with "X"
-                    case 2:
+                    case 2: # Case when marking files for revision, with "X"
                         if " " in filename:
                             filename0, page = filename.split(" ")
 
@@ -140,8 +144,7 @@ def process_pathname(case_num: int, base_path: str, target: str="", data: list=N
                                 "No page marker found."
                             )
 
-                    # 3 Case when cleaning up files name, prior to submission, remove page markers ("##" or "##X")
-                    case 3:
+                    case 3: # Case when cleaning up files name, prior to submission, remove page markers ("##" or "##X")
                         if " " in filename:
                             filename0, page = filename.split(" ")
 
@@ -160,7 +163,6 @@ def process_pathname(case_num: int, base_path: str, target: str="", data: list=N
                                 "SKIP",
                                 "No page marker found."
                             )
-
 
             else:
                 display_message(
