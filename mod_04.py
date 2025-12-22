@@ -12,15 +12,16 @@ date = "14 Dec 2025"
 email = "tlcpineda.projects@gmail.com"
 # FUTURE Prefix language code to filename.
 
-def rename_files(folder_path: str) -> None:
+def rename_files(input_path: str) -> None:
     """
     Rename PSD files depending on append or remove method.
-    :param folder_path: The folder containing the PSD files to be renamed.
+    :param input_path: The folder containing the PSD files to be renamed.
     :return:
     """
-    parent, base = display_path_desc(folder_path, "folder")
+    input_path = os.path.normpath(input_path)   # Normalise path.
+    parent, base = display_path_desc(input_path, "folder")
 
-    if not os.listdir(folder_path):
+    if not os.listdir(input_path):
         display_message(
             "ERROR",
             f"Folder \"{base}\" is empty."
@@ -46,7 +47,7 @@ def rename_files(folder_path: str) -> None:
     print(f"\n<=> Page markers to be {"appended to" if method == "A" else "removed from"} PSD files.")
 
     try:
-        process_pathname(method_case[method], folder_path)
+        process_pathname(method_case[method], input_path)
         display_message(
             "SUCCESS",
             f"Page markers {"appended to" if method == "A" else "removed from"} PSD files."
