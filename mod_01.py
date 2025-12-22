@@ -237,12 +237,5 @@ if __name__ == '__main__':
         if path: process_file(path)
         else: print("\n<=> No file selected.")
 
-        if continue_sequence() == "X":
-            confirm_exit = True
-
-            print("\n<=> Closing down ...")
-        else:
-            confirm_exit = False
-
-            print("\n<=> Restarting ...")
+        confirm_exit =  continue_sequence()
 
