@@ -2,3 +2,10 @@ pyinstaller --onefile --windowed --paths ".venv/Lib/site-packages" --name="Modul
 pyinstaller --onefile --paths ".venv/Lib/site-packages" --name="Module 1" mod_01.py
 
 ?? pyinstaller --onefile --name="Module 1" mod_01.py
+
+
+Unstage file :
+git reset name_of_file
+
+Remove file from repository :
+git rm --cached name_of_file
