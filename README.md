@@ -15,6 +15,7 @@ One title is generally assigned to a typesetter. The main focus is to set the tr
 corresponding PSD files following typesetting guidelines. Depending on assignment, typically a typesetter is assigned
 two destination languages for the same title.
 
+
 **Files**
 
 * Downloaded from Shared Drive Folder
@@ -30,6 +31,7 @@ two destination languages for the same title.
       coordinator; and,
     * *Typeset PSD Files* - (by chapter-language) multiple PSD files for the chapter; for submission to QA, then to
       client.
+
 
 **Local Directory Structure**
 
@@ -114,6 +116,7 @@ two destination languages for the same title.
     * Monitor shared Drive folders for uploaded files from translator, in case translator fails to update on Teams.
     * Monitor Teams for announcements (extra work, general notice, updated guidelines, and the like).
 
+
 ## Future development
 
 As I see it, when all the component have been recreated includes :
@@ -123,7 +126,10 @@ As I see it, when all the component have been recreated includes :
    work logs. Monitoring is currently handled by a Google Apps Script bound to a Sheets log file; and,
 3. a Teams integration to alert team members of my latest submission.
 
+
 ## Directory
+
+### Component Modules
 
 1. [x] **mod_01.py** (PDF Comments Scraper) - creates a CSV file containing all the comments in the PDF file. CSV file
    is used in pasting the comments to respective PSD files.
@@ -133,6 +139,11 @@ As I see it, when all the component have been recreated includes :
 5. [x] **mod_05.py** (Compile PSD to PDF) - convert *{Typeset PSD Files}* to *{Typeset}.pdf* ready from submission.
 6. [ ] **mod_##.py** (Prepare Folders) - fetch clean working files, and create chapter folder/s under title/language
 7. [ ] **mod_##.py** (Translate JP) - small database of Japanese text (often SFX), and matching localisations.
+
+### Primary Module
+
+1. [x] **TS Tools.py** (Typesetting Tools) - compilation of modules 1, 3, 4, and 5.
+
 
 ## Project Tags (Personal)
 
