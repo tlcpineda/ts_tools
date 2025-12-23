@@ -4,16 +4,26 @@ from tkinter import filedialog as fd
 
 def welcome_sequence(items: list):
     max_chars = len(max(items, key=len))
-    line_len =  max_chars + 10 * 2
+    line_len =  max(max_chars + 10 * 2, 60)
     items = [''] + items + ['']
-    hor_bar = line_len * "░"
 
-    print(hor_bar)
+    hor_bar(line_len)
 
     for item in items:
         print(f"{item:^{line_len}}")
 
-    print(hor_bar)
+    hor_bar(line_len)
+
+
+def hor_bar(num_chars: int, text: str=None) -> None:
+    display_x = num_chars * "░"
+
+    if text is not None:    # Redefine display is text is defined
+        text_len = len(text)
+        padded_len = (0 if text is None else 2) * 2 + text_len
+        display_x = display_x[:5] + f"{text:^{padded_len}}" + display_x[5+padded_len:]
+
+    print(display_x)
 
 
 def identify_path(base_type: str) -> str:
