@@ -24,8 +24,6 @@ psd_folder = "2 TYPESETTING"
 def get_translations() -> None:
     """
     Scrape PDF file for comments.
-    :param input_path: The file path of the PDF file
-    :return:
     """
     print(">>> Select a PDF file to scrape ...")
 
