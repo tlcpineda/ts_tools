@@ -5,7 +5,6 @@ Rename folder from "2 TYPESETTING" TO "6 FINAL PSD"
 """
 import fitz
 import os
-
 from lib import welcome_sequence, identify_path, display_path_desc, continue_sequence, display_message, process_pathname, \
     rename_path
 
@@ -17,13 +16,19 @@ email = "tlcpineda.projects@gmail.com"
 folder_name0 = "2 TYPESETTING"
 folder_name1 = "6 FINAL PSD"
 
-def process_rev_file(input_path: str) -> None:
+def process_rev_file() -> None:
     """
     Create a list of pages with comments, or markings, for revisions.
-    :param input_path: The path pointing to the PDF file marked with revisions
-    :return:
     """
-    input_path = os.path.normpath(input_path)  # Normalise path.
+    print(">>> Select a PDF file marked with revisions ...")
+
+    path = identify_path("file")
+
+    if not path:
+        print("\n<=> No file selected.")
+        return
+
+    input_path = os.path.normpath(path)  # Normalise path.
     dirname, filename = display_path_desc(input_path, "file")
 
     try:
@@ -94,12 +99,6 @@ if __name__ == '__main__':
     confirm_exit = False
 
     while not confirm_exit:
-        print(">>> Select a PDF file marked with revisions ...")
-
-        path = identify_path("file")
-
-        if path: process_rev_file(path)
-        else: print("\n<=> No file selected.")
-
+        process_rev_file()
         confirm_exit =  continue_sequence()
 

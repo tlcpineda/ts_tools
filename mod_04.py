@@ -2,8 +2,7 @@
 Rename files in a folder, either by appending page markers (##X), or removing it.
 """
 import os
-from lib import welcome_sequence, identify_path, display_path_desc, continue_sequence, display_message, process_pathname, \
-    rename_path
+from lib import welcome_sequence, identify_path, display_path_desc, continue_sequence, display_message, process_pathname
 
 # Module variables
 mod_name = "Rename PSD Files"
@@ -12,13 +11,19 @@ date = "14 Dec 2025"
 email = "tlcpineda.projects@gmail.com"
 # FUTURE Prefix language code to filename.
 
-def rename_files(input_path: str) -> None:
+def rename_files() -> None:
     """
     Rename PSD files depending on append or remove method.
-    :param input_path: The folder containing the PSD files to be renamed.
-    :return:
     """
-    input_path = os.path.normpath(input_path)   # Normalise path.
+    print(">>> Select PSD folder ...")
+
+    path = identify_path("folder")
+
+    if not path:
+        print("\n<=> No folder selected.")
+        return
+
+    input_path = os.path.normpath(path)   # Normalise path.
     parent, base = display_path_desc(input_path, "folder")
 
     if not os.listdir(input_path):
@@ -73,12 +78,6 @@ if __name__ == '__main__':
     confirm_exit = False
 
     while not confirm_exit:
-        print(">>> Select PSD folder ...")
-
-        path = identify_path("folder")
-
-        if path: rename_files(path)
-        else: print("\n<=> No folder selected.")
-
+        rename_files()
         confirm_exit =  continue_sequence()
 

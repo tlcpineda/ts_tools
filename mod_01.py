@@ -9,7 +9,6 @@ Saves each comment in a CSV file with the following parameters :
 import csv
 import os
 import fitz
-
 from lib import welcome_sequence, identify_path, display_path_desc, continue_sequence, display_message
 
 # Module variables
@@ -239,14 +238,6 @@ if __name__ == '__main__':
     confirm_exit = False
 
     while not confirm_exit:
-        # print(">>> Select a PDF file to scrape ...")
-        #
-        # path = identify_path("file")
-        #
-        # if path: get_translations(path)
-        # else: print("\n<=> No file selected.")
-
         get_translations()
-
         confirm_exit =  continue_sequence()
 

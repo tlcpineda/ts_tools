@@ -3,7 +3,6 @@ Compile PSD files contained in the selected folder into a single PDF file.
 PDF filename is parsed from the parent directory of the files.
 """
 import os
-
 from PIL import Image
 from lib import welcome_sequence, identify_path, display_path_desc, continue_sequence, display_message
 
@@ -17,14 +16,26 @@ lang_dict = {
     'kh': 'Khmer',
     'hi': 'Hindi'
 }   # FUTURE To be harmonised with title codes:  etc "2025-Q4-KH-B5-34", "2025-Q4-HI-B2-12", and title log.
-filename_pattern = '{TitleName_vol[3]_chap[4]_pg[3] pg[2]}.psd' or '{TitleName_vol[3]_chap[4]_pg[3] pg[2]}X.psd'
+filename_patterns = [
+    '{TitleName_vol[3]_chap[4]_pg[3] pg[2]}.psd',
+    '{TitleName_vol[3]_chap[4]_pg[3] pg[2]}X.psd',
+    '{TitleName_vol[3]_chap[4]_pg[3]}.psd'
+]
 
-def compile_to_pdf(input_folder):
-    input_folder = os.path.normpath(input_folder)   # Normalise path.
-    display_path_desc(input_folder, 'folder')
+def compile_to_pdf():
+    print(">>> Select PSD folder ...")
+
+    path = identify_path("folder")
+
+    if not path:
+        print("\n<=> No folder selected.")
+        return
+
+    input_path = os.path.normpath(path)   # Normalise path.
+    display_path_desc(input_path, 'folder')
 
     # Get and sort PSD files from folder; only files that follow filename pattern.
-    files = filter_files(input_folder)
+    files = filter_files(input_path)
 
     if not files:
         print("No PSD files fit to be compiled.")
@@ -37,16 +48,21 @@ def compile_to_pdf(input_folder):
 
     # Initialise the generator
     # Slice [1:]; first image is handled by the save() call, as anchor
-    img_stream = image_generator(input_folder, files[1:])
-    first_path = os.path.join(input_folder, files[0])
+    img_stream = image_generator(input_path, files[1:])
+    first_path = os.path.join(input_path, files[0])
 
-    output_filepath = gen_out_filepath(input_folder)
+    output_filepath = gen_out_filepath(input_path)
 
     try:
         with Image.open(first_path) as first_img:
             base_img = first_img.convert("RGB")
 
             # The "save" function pulls from the generator one by one
+            display_message(
+                "PROCESSING",
+                f"Creating anchor file : {files[0]} ...",
+            )
+
             base_img.save(
                 output_filepath,
                 "PDF",
@@ -78,10 +94,7 @@ def filter_files(folder: str) -> list:
     filtered_files = []
 
     for f  in os.listdir(folder):
-        # Check if filename follows filename pattern.
-        ext = os.path.splitext(f)[1]
-
-        if ' ' in f and ext.lower() == '.psd':  # Append file to return list if page_marker exists.
+        if os.path.splitext(f)[1].lower() == '.psd':  # Append file to return list if page_marker exists.
             page = get_pg_num(f)
             if page != 999: filtered_files.append(f)
 
@@ -95,7 +108,7 @@ def get_pg_num(filename: str) -> int:
     :return: The page number
     """
     basename = os.path.splitext(filename)[0]
-    pg_str = ''.join([char for char in basename.split(' ')[1] if char.isdigit()])
+    pg_str = ''.join([char for char in basename if char.isdigit()])[-2:]  # Get the last two numeric characters.
 
     return int(pg_str) if pg_str else 999 # Return an absurdly large number if pg_str is null string.
 
@@ -114,7 +127,7 @@ def image_generator(folder: str, files: list):
             with Image.open(filepath) as img:
                 display_message(
                     "PROCESSING",
-                    f"Converting {filename} ...",
+                    f"Adding file : {filename} ...",
                 )
 
                 yield img.convert("RGB")
@@ -122,7 +135,7 @@ def image_generator(folder: str, files: list):
         except Exception as e:
             display_message(
                 "ERROR",
-                f"Error processing {filename}",
+                f"Error processing file : {filename}",
                 f"{e}"
             )
 
@@ -160,12 +173,6 @@ if __name__ == "__main__":
     confirm_exit = False
 
     while not confirm_exit:
-        print(">>> Select PSD folder ...")
-
-        path = identify_path("folder")
-
-        if path: compile_to_pdf(path)
-        else: print("\n<=> No folder selected.")
-
+        compile_to_pdf()
         confirm_exit =  continue_sequence()
 
