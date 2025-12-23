@@ -13,3 +13,7 @@ git rm --cached name_of_file
 Merge branch B (while in branch B) to A :
 git checkout branchA
 git merge branchB
+
+Delete a branch local and remote :
+git branch -d branchA
+git push origin -d mod_01-transform
