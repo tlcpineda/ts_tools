@@ -21,13 +21,21 @@ csv_name = "translations.csv"   # The filename of the output CSV file
 textbox_dim_dst = [dim * 72 for dim in [1.25, 1.75]] # width x height in inches; converted to points.
 psd_folder = "2 TYPESETTING"
 
-def process_file(input_path: str) -> None:
+def get_translations() -> None:
     """
     Scrape PDF file for comments.
     :param input_path: The file path of the PDF file
     :return:
     """
-    input_path = os.path.normpath(input_path)  # Normalise path.
+    print(">>> Select a PDF file to scrape ...")
+
+    path = identify_path("file")
+
+    if not path:
+        print("\n<=> No file selected.")
+        return
+
+    input_path = os.path.normpath(path)  # Normalise path.
     dirname, filename = display_path_desc(input_path, "file")
 
     header = [
@@ -174,6 +182,8 @@ def write_to_csv(directory: str, data: list) -> None:
             f"{len(data) - 1} comments written to {csv_name}."
         )
 
+        display_path_desc(csv_path, 'file')
+
     except Exception as e:
         display_message(
             "ERROR",
@@ -231,12 +241,14 @@ if __name__ == '__main__':
     confirm_exit = False
 
     while not confirm_exit:
-        print(">>> Select a PDF file to scrape ...")
+        # print(">>> Select a PDF file to scrape ...")
+        #
+        # path = identify_path("file")
+        #
+        # if path: get_translations(path)
+        # else: print("\n<=> No file selected.")
 
-        path = identify_path("file")
-
-        if path: process_file(path)
-        else: print("\n<=> No file selected.")
+        get_translations()
 
         confirm_exit =  continue_sequence()
 
