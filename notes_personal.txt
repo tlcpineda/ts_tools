@@ -9,3 +9,7 @@ git reset name_of_file
 
 Remove file from repository :
 git rm --cached name_of_file
+
+Merge branch B (while in branch B) to A :
+git checkout branchA
+git merge branchB
