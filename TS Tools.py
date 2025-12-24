@@ -1,8 +1,8 @@
 """
-
+A compilation of modules to assist in local processes during typesetting.
 """
 
-from lib import welcome_sequence, hor_bar, identify_path, display_path_desc, continue_sequence, display_message
+from lib import welcome_sequence, hor_bar
 from mod_01 import get_translations
 from mod_03 import process_rev_file
 from mod_04 import rename_files
