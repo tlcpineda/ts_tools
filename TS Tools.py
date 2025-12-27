@@ -10,8 +10,8 @@ from mod_05 import compile_to_pdf
 
 # App variables
 app_name = "Typesetting Tools"
-app_ver = "1.00.00"
-date = "23 Dec 2025"
+app_ver = "1.00.01"
+date = "28 Dec 2025"
 email = "tlcpineda.projects@gmail.com"
 options = [
     {
