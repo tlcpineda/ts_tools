@@ -29,6 +29,7 @@ def hor_bar(num_chars: int, text: str=None) -> None:
 def identify_path(base_type: str) -> str:
     root = tk.Tk()
     root.withdraw()
+    root.attributes("-topmost", True)
 
     path = None
 
@@ -43,6 +44,7 @@ def identify_path(base_type: str) -> str:
                 title="Select Folder"
             )
 
+    root.destroy()
     return path
 
 
