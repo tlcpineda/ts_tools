@@ -6,19 +6,31 @@ Saves each comment in a CSV file with the following parameters :
     {w, h} - width and height of the comment box, normalised with respect to the dimensions of the PDF page
     {text} - text of the comment
 """
+
 import csv
 import os
+
 import fitz
-from lib import welcome_sequence, identify_path, display_path_desc, continue_sequence, display_message
+
+from lib import (
+    continue_sequence,
+    display_message,
+    display_path_desc,
+    identify_path,
+    welcome_sequence,
+)
 
 # Module variables
 mod_name = "PDF Comments Scraper"
 mod_ver = "2"
 date = "18 Dec 2025"
 email = "tlcpineda.projects@gmail.com"
-csv_name = "translations.csv"   # The filename of the output CSV file
-textbox_dim_dst = [dim * 72 for dim in [1.25, 1.75]] # width x height in inches; converted to points.
+csv_name = "translations.csv"  # The filename of the output CSV file
+textbox_dim_dst = [
+    dim * 72 for dim in [1.25, 1.75]
+]  # width x height in inches; converted to points.
 psd_folder = "2 TYPESETTING"
+
 
 def get_translations() -> None:
     """
@@ -35,18 +47,11 @@ def get_translations() -> None:
     input_path = os.path.normpath(path)  # Normalise path.
     dirname, filename = display_path_desc(input_path, "file")
 
-    header = [
-        "page_num",
-        "x0",
-        "y0",
-        "w_box",
-        "h_box",
-        "text"
-    ]
+    header = ["page_num", "x0", "y0", "w_box", "h_box", "text"]
     data_rows = []
 
     # User input for right-to-left reading order
-    print(f"\n>>> Sort comments according to Japanese reading order (RTL) ?")
+    print("\n>>> Sort comments according to Japanese reading order (RTL) ?")
 
     rtl = None
 
@@ -62,14 +67,14 @@ def get_translations() -> None:
         else:
             rtl = False
 
-    print(f"\n<=> RTL sort order will{" " if rtl else " not "}be applied.")
+    print(f"\n<=> RTL sort order will{' ' if rtl else ' not '}be applied.")
 
     try:
         doc = fitz.open(input_path)
         col_size = [6, 10]
 
-        print(f"\n<=> Summary of Retrieved Comments :")
-        print(f"<=> | {"Page":>{col_size[0]}} | {"Comments":>{col_size[1]}} |")
+        print("\n<=> Summary of Retrieved Comments :")
+        print(f"<=> | {'Page':>{col_size[0]}} | {'Comments':>{col_size[1]}} |")
 
         for page_index, page in enumerate(doc.pages()):
             page_comments = []
@@ -78,45 +83,61 @@ def get_translations() -> None:
 
             # Get the transformation matrix used in embedding the image onto the page.
             img_props = fetch_img_props(page)
-            w, h, x_off, y_off = img_props['width'], img_props['height'], img_props['x_off'], img_props['y_off']
+            w, h, x_off, y_off = (
+                img_props["width"],
+                img_props["height"],
+                img_props["x_off"],
+                img_props["y_off"],
+            )
 
-            page_rect = page.rect   # From PDF page
+            page_rect = page.rect  # From PDF page
             page_width, page_height = page_rect.width, page_rect.height
             types = [0, 2]  # PDF_ANNOT_TEXT, PDF_ANNOT_FREE_TEXT
             annots = list(page.annots(types=types))
-            norm_dim = lambda dim, dim1: (dim[0] / dim1[0], dim[1] / dim1[1])
+
+            def norm_dim(dim, dim1):
+                return (dim[0] / dim1[0], dim[1] / dim1[1])
 
             for annot in annots:
                 annot_tl = annot.rect.top_left
-                x0, y0 = annot_tl.transform(fitz.Matrix(w / page_width, 0, 0, h / page_height, -x_off, -y_off))
+                x0, y0 = annot_tl.transform(
+                    fitz.Matrix(w / page_width, 0, 0, h / page_height, -x_off, -y_off)
+                )
                 x0_norm, y0_norm = norm_dim((x0, y0), (w, h))
                 w_norm, h_norm = norm_dim(textbox_dim_dst, (w, h))
-                comment = clean_up(annot.info['content'])
-                clamp = lambda dim: max(0.01, min(dim, 0.99))   # Ensure that value is in [0.01, 0.99]; 1% easement
+                comment = clean_up(annot.info["content"])
 
-                page_comments.append([
-                    page_marker,
-                    clamp(x0_norm),
-                    clamp(y0_norm),
-                    int(round(y0_norm / 0.05, 2)),    # bin, used in sorting vertically.
-                    f"{w_norm:g}",
-                    f"{h_norm:g}",
-                    comment
-                ])
+                # Ensure that value is in [0.01, 0.99]; 1% easement
+                def clamp(dim):
+                    return max(0.01, min(dim, 0.99))
 
-            data_rows = data_rows + sort_rtl(page_comments, rtl)   # Append sorted page comments to final list.
+                page_comments.append(
+                    [
+                        page_marker,
+                        clamp(x0_norm),
+                        clamp(y0_norm),
+                        int(
+                            round(y0_norm / 0.05, 2)
+                        ),  # bin, used in sorting vertically.
+                        f"{w_norm:g}",
+                        f"{h_norm:g}",
+                        comment,
+                    ]
+                )
 
-            print(f"<=> | {page_num:>{col_size[0]}} | {len(annots) or "-":>{col_size[1]}} |")
+            data_rows = data_rows + sort_rtl(
+                page_comments, rtl
+            )  # Append sorted page comments to final list.
+
+            print(
+                f"<=> | {page_num:>{col_size[0]}} | {len(annots) or '-':>{col_size[1]}} |"
+            )
 
         doc.close()
         write_to_csv(dirname, [header] + data_rows)
 
     except Exception as e:
-        display_message(
-            "ERROR",
-            f"Error processing \"{filename}\"",
-            f"{e}"
-        )
+        display_message("ERROR", f'Error processing "{filename}"', f"{e}")
 
 
 def clean_up(comment: str) -> str:
@@ -132,12 +153,7 @@ def clean_up(comment: str) -> str:
     """
     clean_comment = comment.strip()
 
-    rep_dict = {
-        "\n": " <>",
-        "\r": " <>",
-        "«": "\"",
-        "»": "\""
-    }
+    rep_dict = {"\n": " <>", "\r": " <>", "«": '"', "»": '"'}
 
     if comment:
         for key, value in rep_dict.items():
@@ -155,7 +171,7 @@ def sort_rtl(page_data: list, rtl: bool) -> list:
     :param rtl: True follows Japanese manga reading order.
     :return: The reversed list of sorted comments; which reverts to proper order when transferred to Photoshop.
     """
-    sorted_data = sorted(page_data, key=lambda x: ( -x[3], x[1] * rtl))
+    sorted_data = sorted(page_data, key=lambda x: (-x[3], x[1] * rtl))
 
     # Remove "bin" (index 3)), and truncate x0, y0 to (at most) 6 decimal places.
     return list(map(lambda x: [x[0], f"{x[1]:g}", f"{x[2]:g}"] + x[4:], sorted_data))
@@ -174,22 +190,15 @@ def write_to_csv(directory: str, data: list) -> None:
         with open(csv_path, "w", newline="", encoding="utf-8") as file:
             csv.writer(file).writerows(data)
 
-        display_message(
-            "SUCCESS",
-            f"{len(data) - 1} comments written to {csv_name}."
-        )
+        display_message("SUCCESS", f"{len(data) - 1} comments written to {csv_name}.")
 
-        display_path_desc(csv_path, 'file')
+        display_path_desc(csv_path, "file")
 
     except Exception as e:
-        display_message(
-            "ERROR",
-            f"Error writing to CSV file {csv_name}.",
-            f"{e}"
-        )
+        display_message("ERROR", f"Error writing to CSV file {csv_name}.", f"{e}")
 
 
-def fetch_img_props(page: fitz.Page) -> dict | None:
+def fetch_img_props(page: fitz.Page) -> dict:
     img_list = page.get_images(full=True)
 
     if img_list:
@@ -211,27 +220,20 @@ def fetch_img_props(page: fitz.Page) -> dict | None:
         img_width, b, c, img_height, x_off, y_off = matrix
 
         return {
-            'width': img_width,
-            'height': img_height,
-            'x_off': x_off,
-            'y_off': y_off,
+            "width": img_width,
+            "height": img_height,
+            "x_off": x_off,
+            "y_off": y_off,
         }
 
     else:
-        display_message(
-            "ERROR",
-            "No image found on page."
-        )
+        display_message("ERROR", "No image found on page.")
 
-        return None
+        return {}
 
 
-if __name__ == '__main__':
-    welcome_sequence([
-        mod_name,
-        f"ver {mod_ver} {date}",
-        email
-    ])
+if __name__ == "__main__":
+    welcome_sequence([mod_name, f"ver {mod_ver} {date}", email])
 
     print(input("\n>>> Press enter to continue ..."))
 
@@ -239,5 +241,4 @@ if __name__ == '__main__':
 
     while not confirm_exit:
         get_translations()
-        confirm_exit =  continue_sequence()
-
+        confirm_exit = continue_sequence()

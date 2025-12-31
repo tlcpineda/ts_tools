@@ -2,10 +2,11 @@ import os
 import tkinter as tk
 from tkinter import filedialog as fd
 
+
 def welcome_sequence(items: list):
     max_chars = len(max(items, key=len))
-    line_len =  max(max_chars + 10 * 2, 60)
-    items = [''] + items + ['']
+    line_len = max(max_chars + 10 * 2, 60)
+    items = [""] + items + [""]
 
     hor_bar(line_len)
 
@@ -15,13 +16,15 @@ def welcome_sequence(items: list):
     hor_bar(line_len)
 
 
-def hor_bar(num_chars: int, text: str=None) -> None:
+def hor_bar(num_chars: int, text: str = "") -> None:
     display_x = num_chars * "░"
 
-    if text is not None:    # Redefine display is text is defined
+    if text is not None:  # Redefine display is text is defined
         text_len = len(text)
         padded_len = (0 if text is None else 2) * 2 + text_len
-        display_x = display_x[:5] + f"{text:^{padded_len}}" + display_x[5+padded_len:]
+        display_x = (
+            display_x[:5] + f"{text:^{padded_len}}" + display_x[5 + padded_len :]
+        )
 
     print(display_x)
 
@@ -31,18 +34,16 @@ def identify_path(base_type: str) -> str:
     root.withdraw()
     root.attributes("-topmost", True)
 
-    path = None
+    path = ""
 
     match base_type:
         case "file":
             path = fd.askopenfilename(
                 title="Select PDF File",
-                filetypes=(("PDF files", "*.pdf"), ("All files", "*.*"))
+                filetypes=(("PDF files", "*.pdf"), ("All files", "*.*")),
             )
         case "folder":
-            path = fd.askdirectory(
-                title="Select Folder"
-            )
+            path = fd.askdirectory(title="Select Folder")
 
     root.destroy()
     return path
@@ -52,11 +53,17 @@ def display_path_desc(filepath: str, base_type: str) -> tuple:
     parent_name, base_name = os.path.split(filepath)
     split_parent_name = parent_name.split(os.sep)
     num_levels = 3
-    process_dirname = parent_name if len(split_parent_name) <= num_levels else f".../{"/".join(split_parent_name[-3:])}"
+    process_dirname = (
+        parent_name
+        if len(split_parent_name) <= num_levels
+        else f".../{'/'.join(split_parent_name[-3:])}"
+    )
 
-    print(f"\n<=> {base_type.title()} Details :"
-          f"\n<=>  Directory : {process_dirname}"
-          f"\n<=>  Base Name : {base_name}")
+    print(
+        f"\n<=> {base_type.title()} Details :"
+        f"\n<=>  Directory : {process_dirname}"
+        f"\n<=>  Base Name : {base_name}"
+    )
 
     return parent_name, base_name
 
@@ -66,15 +73,17 @@ def continue_sequence() -> bool:
     resp = "C"
 
     while not proper_resp:
-        print("\n>>> Select an option :"
-              "\n>>>  [C]ontinue with another chapter ?"
-              "\n>>>  E[X]it and close this window ?")
+        print(
+            "\n>>> Select an option :"
+            "\n>>>  [C]ontinue with another chapter ?"
+            "\n>>>  E[X]it and close this window ?"
+        )
 
         resp = input(">>> ").upper()
 
-        proper_resp = True if resp in ['C', 'X'] else False
+        proper_resp = True if resp in ["C", "X"] else False
 
-    if resp == 'X':
+    if resp == "X":
         print("\n<=> Closing down ...")
 
         return True
@@ -84,35 +93,34 @@ def continue_sequence() -> bool:
         return False
 
 
-def display_message(tag: str, message: str, exception: str=None) -> None:
+def display_message(tag: str, message: str, exception: str = "") -> None:
     print(f"\n<=> [{tag}] {message}")
 
     if exception:
         print(f"<=>  {exception}")
 
 
-def process_pathname(case_num: int, base_path: str, target: str="", data: list=None) -> str | None:
+def process_pathname(
+    case_num: int, base_path: str, target: str = "", data: list = []
+) -> str:
     psd_path = os.path.join(base_path, target)
 
-    if not psd_path: return None
+    if not psd_path:
+        return ""
 
     display_path_desc(psd_path, "folder")
 
     for item in os.listdir(psd_path):
         filename, ext = os.path.splitext(item)
 
-        display_message(
-            "PROCESSING",
-            f"{item} ..."
-        )
+        display_message("PROCESSING", f"{item} ...")
 
-        if ext.lower()==".psd": # Process only PSD files
+        if ext.lower() == ".psd":  # Process only PSD files
             path0 = os.path.join(psd_path, item)
 
             if os.path.isfile(path0):
-
                 match case_num:
-                    case 1: # Initial case when appending page markers ("##X") to original file name.
+                    case 1:  # Initial case when appending page markers ("##X") to original file name.
                         page_num = filename[-2:]
 
                         if page_num.isdigit():
@@ -121,17 +129,14 @@ def process_pathname(case_num: int, base_path: str, target: str="", data: list=N
 
                             if path0 == path1:
                                 display_message(
-                                    "SKIP",
-                                    "File with the same target name exists."
+                                    "SKIP", "File with the same target name exists."
                                 )
-                            else: rename_path(path0, path1, "file")
+                            else:
+                                rename_path(path0, path1, "file")
                         else:
-                            display_message(
-                                "SKIP",
-                                "Not a valid file path."
-                            )
+                            display_message("SKIP", "Not a valid file path.")
 
-                    case 2: # Case when marking files for revision, with "X"
+                    case 2:  # Case when marking files for revision, with "X"
                         if " " in filename:
                             filename0, page = filename.split(" ")
 
@@ -140,23 +145,15 @@ def process_pathname(case_num: int, base_path: str, target: str="", data: list=N
                                 path1 = os.path.join(psd_path, new_filename)
 
                                 if path0 == path1:
-                                    display_message(
-                                        "SKIP",
-                                        "File already marked."
-                                    )
-                                else: rename_path(path0, path1, "file")
+                                    display_message("SKIP", "File already marked.")
+                                else:
+                                    rename_path(path0, path1, "file")
                             else:
-                                display_message(
-                                    "SKIP",
-                                    f"No revisions required."
-                                )
+                                display_message("SKIP", "No revisions required.")
                         else:
-                            display_message(
-                                "SKIP",
-                                "No page marker found."
-                            )
+                            display_message("SKIP", "No page marker found.")
 
-                    case 3: # Case when cleaning up files name, prior to submission, remove page markers ("##" or "##X")
+                    case 3:  # Case when cleaning up files name, prior to submission, remove page markers ("##" or "##X")
                         if " " in filename:
                             filename0, page = filename.split(" ")
 
@@ -165,27 +162,17 @@ def process_pathname(case_num: int, base_path: str, target: str="", data: list=N
 
                             if path0 == path1:
                                 display_message(
-                                    "SKIP",
-                                    "File with the same name exists."
+                                    "SKIP", "File with the same name exists."
                                 )
                             else:
                                 rename_path(path0, path1, "file")
                         else:
-                            display_message(
-                                "SKIP",
-                                "No page marker found."
-                            )
+                            display_message("SKIP", "No page marker found.")
 
             else:
-                display_message(
-                    "SKIP",
-                    "Not a valid file path."
-                )
+                display_message("SKIP", "Not a valid file path.")
         else:
-            display_message(
-                "SKIP",
-                "Not a PSD file."
-            )
+            display_message("SKIP", "Not a PSD file.")
 
     return psd_path
 
@@ -198,15 +185,8 @@ def rename_path(path_src: str, path_dst, pathtype: str) -> None:
 
         display_message(
             "SUCCESS",
-            f"F{pathtype[1:]} renamed."
-            f"\n<=>  From : {base_src}"
-            f"\n<=>  To   : {base_dst}"
+            f"F{pathtype[1:]} renamed.\n<=>  From : {base_src}\n<=>  To   : {base_dst}",
         )
 
     except Exception as e:
-        display_message(
-            "ERROR",
-            f"Failed to rename {pathtype}.",
-            f"{e}"
-        )
-
+        display_message("ERROR", f"Failed to rename {pathtype}.", f"{e}")

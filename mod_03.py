@@ -3,10 +3,20 @@ Takes a PDF file with comments as input.
 Identifies pages with comments, ie possible revisions, and mark corresponding PSD file
 Rename folder from "2 TYPESETTING" TO "6 FINAL PSD"
 """
-import fitz
+
 import os
-from lib import welcome_sequence, identify_path, display_path_desc, continue_sequence, display_message, process_pathname, \
-    rename_path
+
+import fitz
+
+from lib import (
+    continue_sequence,
+    display_message,
+    display_path_desc,
+    identify_path,
+    process_pathname,
+    rename_path,
+    welcome_sequence,
+)
 
 # Module variables
 mod_name = "Revisions"
@@ -15,6 +25,7 @@ date = "12 Dec 2025"
 email = "tlcpineda.projects@gmail.com"
 folder_name0 = "2 TYPESETTING"
 folder_name1 = "6 FINAL PSD"
+
 
 def process_rev_file() -> None:
     """
@@ -36,7 +47,7 @@ def process_rev_file() -> None:
         col_size = [6, 10]
 
         print("\n<=> Summary :")
-        print(f"<=> | {"Page":>{col_size[0]}} | {"Comments":>{col_size[1]}} |")
+        print(f"<=> | {'Page':>{col_size[0]}} | {'Comments':>{col_size[1]}} |")
 
         pages_marked = []
 
@@ -46,53 +57,44 @@ def process_rev_file() -> None:
             # Select all pages with at least one annotation (usually of type [0-TEXT, 2-FREE_TEXT, 13-STAMP).
             annots = list(page.annots())
 
-            if len(annots)>0: pages_marked.append(f"{page_num:02}")
+            if len(annots) > 0:
+                pages_marked.append(f"{page_num:02}")
 
-            print(f"<=> | {page_num:>{col_size[0]}} | {len(annots) or "-":>{col_size[1]}} |")
+            print(
+                f"<=> | {page_num:>{col_size[0]}} | {len(annots) or '-':>{col_size[1]}} |"
+            )
 
-        folder0 = process_pathname(2, dirname, folder_name0, pages_marked) # Mark files for revision.
+        folder0 = process_pathname(
+            2, dirname, folder_name0, pages_marked
+        )  # Mark files for revision.
 
         len_pages = len(pages_marked)
-        message = "No revisions required for this chapter." # Default message for zero annotations.
+        message = "No revisions required for this chapter."  # Default message for zero annotations.
 
-        if len_pages>0: message = f"{len_pages} file{"s" if len_pages>1 else ""} marked for revision."
+        if len_pages > 0:
+            message = (
+                f"{len_pages} file{'s' if len_pages > 1 else ''} marked for revision."
+            )
 
-        display_message(
-            "SUCCESS",
-            message
-        )
+        display_message("SUCCESS", message)
 
         folder1 = os.path.join(dirname, folder_name1)
 
         if folder0 != folder1:
             # Check if folder1 already exists.
             if os.path.exists(folder1):
-                display_message(
-                    "ERROR",
-                    "New folder name is already assigned."
-                )
+                display_message("ERROR", "New folder name is already assigned.")
             else:
                 rename_path(folder0, folder1, "folder")
         else:
-            display_message(
-                "ERROR",
-                "New folder name is the same as old name."
-            )
+            display_message("ERROR", "New folder name is the same as old name.")
 
     except Exception as e:
-        display_message(
-            "ERROR",
-            "Failed marking files for revision.",
-            f"{e}"
-        )
+        display_message("ERROR", "Failed marking files for revision.", f"{e}")
 
 
-if __name__ == '__main__':
-    welcome_sequence([
-        mod_name,
-        f"ver {mod_ver} {date}",
-        email
-    ])
+if __name__ == "__main__":
+    welcome_sequence([mod_name, f"ver {mod_ver} {date}", email])
 
     print(input("\n>>> Press enter to continue ..."))
 
@@ -100,5 +102,4 @@ if __name__ == '__main__':
 
     while not confirm_exit:
         process_rev_file()
-        confirm_exit =  continue_sequence()
-
+        confirm_exit = continue_sequence()

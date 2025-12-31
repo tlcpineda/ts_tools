@@ -2,9 +2,18 @@
 Compile PSD files contained in the selected folder into a single PDF file.
 PDF filename is parsed from the parent directory of the files.
 """
+
 import os
+
 from PIL import Image
-from lib import welcome_sequence, identify_path, display_path_desc, continue_sequence, display_message
+
+from lib import (
+    continue_sequence,
+    display_message,
+    display_path_desc,
+    identify_path,
+    welcome_sequence,
+)
 
 # Module variables
 mod_name = "Compile PSD to PDF"
@@ -13,14 +22,15 @@ date = "19 Dec 2025"
 email = "tlcpineda.projects@gmail.com"
 psd_folder = "2 TYPESETTING"
 lang_dict = {
-    'kh': 'Khmer',
-    'hi': 'Hindi'
-}   # FUTURE To be harmonised with title codes:  etc "2025-Q4-KH-B5-34", "2025-Q4-HI-B2-12", and title log.
+    "kh": "Khmer",
+    "hi": "Hindi",
+}  # FUTURE To be harmonised with title codes:  etc "2025-Q4-KH-B5-34", "2025-Q4-HI-B2-12", and title log.
 filename_patterns = [
-    '{TitleName_vol[3]_chap[4]_pg[3] pg[2]}.psd',
-    '{TitleName_vol[3]_chap[4]_pg[3] pg[2]}X.psd',
-    '{TitleName_vol[3]_chap[4]_pg[3]}.psd'
+    "{TitleName_vol[3]_chap[4]_pg[3] pg[2]}.psd",
+    "{TitleName_vol[3]_chap[4]_pg[3] pg[2]}X.psd",
+    "{TitleName_vol[3]_chap[4]_pg[3]}.psd",
 ]
+
 
 def compile_to_pdf():
     print(">>> Select PSD folder ...")
@@ -31,8 +41,8 @@ def compile_to_pdf():
         print("\n<=> No folder selected.")
         return
 
-    input_path = os.path.normpath(path)   # Normalise path.
-    display_path_desc(input_path, 'folder')
+    input_path = os.path.normpath(path)  # Normalise path.
+    display_path_desc(input_path, "folder")
 
     # Get and sort PSD files from folder; only files that follow filename pattern.
     files = filter_files(input_path)
@@ -68,35 +78,31 @@ def compile_to_pdf():
                 "PDF",
                 resolution=72.0,
                 save_all=True,
-                append_images=img_stream
+                append_images=img_stream,
             )
 
-        display_message(
-            "SUCCESS",
-            f"{len(files)} PSD files compiled as PDF."
-        )
+        display_message("SUCCESS", f"{len(files)} PSD files compiled as PDF.")
         display_path_desc(output_filepath, "file")
 
     except Exception as e:
-        display_message(
-            "ERROR",
-            "Failed to create PDF.",
-            f"{e}"
-        )
+        display_message("ERROR", "Failed to create PDF.", f"{e}")
 
 
 def filter_files(folder: str) -> list:
-    """"
+    """
     Filter files that follow the filename pattern, with the last two/three digits as the page markers.
     :param folder: The parent folder of the PSD files
     :return filtered_files: The list of filtered PSD files to be compiled
     """
     filtered_files = []
 
-    for f  in os.listdir(folder):
-        if os.path.splitext(f)[1].lower() == '.psd':  # Append file to return list if page_marker exists.
+    for f in os.listdir(folder):
+        if (
+            os.path.splitext(f)[1].lower() == ".psd"
+        ):  # Append file to return list if page_marker exists.
             page = get_pg_num(f)
-            if page != 999: filtered_files.append(f)
+            if page != 999:
+                filtered_files.append(f)
 
     return filtered_files
 
@@ -108,9 +114,13 @@ def get_pg_num(filename: str) -> int:
     :return: The page number
     """
     basename = os.path.splitext(filename)[0]
-    pg_str = ''.join([char for char in basename if char.isdigit()])[-2:]  # Get the last two numeric characters.
+    pg_str = "".join([char for char in basename if char.isdigit()])[
+        -2:
+    ]  # Get the last two numeric characters.
 
-    return int(pg_str) if pg_str else 999 # Return an absurdly large number if pg_str is null string.
+    return (
+        int(pg_str) if pg_str else 999
+    )  # Return an absurdly large number if pg_str is null string.
 
 
 def image_generator(folder: str, files: list):
@@ -133,11 +143,7 @@ def image_generator(folder: str, files: list):
                 yield img.convert("RGB")
 
         except Exception as e:
-            display_message(
-                "ERROR",
-                f"Error processing file : {filename}",
-                f"{e}"
-            )
+            display_message("ERROR", f"Error processing file : {filename}", f"{e}")
 
 
 def gen_out_filepath(folder_path: str) -> str:
@@ -149,9 +155,11 @@ def gen_out_filepath(folder_path: str) -> str:
     parent = os.path.dirname(folder_path)
     title_folder, ch_folder = parent.split(os.sep)[-2:]
     title_split = title_folder.split(" ")
-    lang_iso = title_split[0].split('-')[2].lower()
-    ch_num = ch_folder.replace('CH', '')
-    title = ' '.join(title_split[1:]) # Assume that the title is already properly capitalised.
+    lang_iso = title_split[0].split("-")[2].lower()
+    ch_num = ch_folder.replace("CH", "")
+    title = " ".join(
+        title_split[1:]
+    )  # Assume that the title is already properly capitalised.
     pdf_name = f"{title}_{lang_dict[lang_iso]} CH {ch_num}_For TP Check.pdf"
     out_filepath = os.path.join(parent, pdf_name)
 
@@ -162,11 +170,7 @@ def gen_out_filepath(folder_path: str) -> str:
 
 
 if __name__ == "__main__":
-    welcome_sequence([
-        mod_name,
-        f"ver {mod_ver} {date}",
-        email
-    ])
+    welcome_sequence([mod_name, f"ver {mod_ver} {date}", email])
 
     print(input("\n>>> Press enter to continue ..."))
 
@@ -174,5 +178,4 @@ if __name__ == "__main__":
 
     while not confirm_exit:
         compile_to_pdf()
-        confirm_exit =  continue_sequence()
-
+        confirm_exit = continue_sequence()
