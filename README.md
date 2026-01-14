@@ -137,13 +137,23 @@ As I see it, when all the component have been recreated includes :
 3. [x] **mod_03.py** (Revisions) - mark PSD files that needs to be edited, rename parent folder.
 4. [x] **mod_04.py** (Rename Files) - append/remove page markers to/from PSD filenames: ##x, ##
 5. [x] **mod_05.py** (Compile PSD to PDF) - convert *{Typeset PSD Files}* to *{Typeset}.pdf* ready from submission.
-6. [ ] **mod_##.py** (Prepare Folders) - fetch clean working files, and create chapter folder/s under title/language
+6. [ ] **mod_06.py** (Drive Operations) - fetch working files, and create chapter folder/s under title/language; and, submit files to designated shared Drive folders
 7. [ ] **mod_##.py** (Translate JP) - small database of Japanese text (often SFX), and matching localisations.
 
-### Primary Module
+### Distribution
 
-1. [x] **TS Tools.py** (Typesetting Tools) - compilation of modules 1, 3, 4, and 5.
+1. **TS Tools v1.00.00.exe** - compilation of modules 1, 3, 4, and 5;
+2. **TS Tools v1.00.01.exe** - update pop up window to be always on top;
+3. **v10100/** - compilation of modules 1, 3, 4, 5, and 6;
 
+```
++- v10100/
+   +- TS Tools v1.01.00.exe     <-- The app
+   +- .env                      <-- YOUR CONFIG (Manual copy)
+   +- creds/                    <-- YOUR KEYS (Manual copy)
+      +- client_secret.json
+      +- token.json
+```
 
 ## Project Tags (Personal)
 
