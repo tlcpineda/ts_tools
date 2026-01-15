@@ -150,9 +150,10 @@ As I see it, when all the component have been recreated includes :
 +- v10100/
    +- TS Tools v1.01.00.exe     <-- The app
    +- .env                      <-- YOUR CONFIG (Manual copy)
-   +- creds/                    <-- YOUR KEYS (Manual copy)
+   +- resources/                <-- YOUR KEYS (Manual copy)
       +- client_secret.json
       +- token.json
+      +- project_cache.json
 ```
 
 ## Project Tags (Personal)
