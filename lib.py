@@ -19,7 +19,7 @@ def welcome_sequence(items: list):
 def hor_bar(num_chars: int, text: str = "") -> None:
     display_x = num_chars * "░"
 
-    if text is not None:  # Redefine display is text is defined
+    if text:  # Redefine display is text is defined
         text_len = len(text)
         padded_len = (0 if text is None else 2) * 2 + text_len
         display_x = (
