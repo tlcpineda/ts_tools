@@ -67,7 +67,7 @@ two destination languages for the same title.
    +- Title Code n
 ```
 
-* Title Code - `{year}-Q{quarter}-{lang_code}-B{batch_num}_{title_num} {Title}`
+* <a name='title-code'>Title Code</a> - `{year}-Q{quarter}-{lang_code}-B{batch_num}_{title_num} {Title}`
     * `{year}` - current year when title was assigned; 4 digits;
     * `{quarter}` - current quarter of the year when title was assigned; 1 digit;
     * `{lang_code}` - ISO language code; 2 characters;
@@ -154,7 +154,41 @@ As I see it, when all the component have been recreated includes :
       +- client_secret.json
       +- token.json
       +- project_cache.json
+      *- drive_cache.json
 ```
+
+### Schema
+* **project_cache.json** - sample content :
+  ```
+  [
+    {
+      "local_folder_name": "2025-Q4-KH-B5-98 Title1",
+      "drive_folder_id": "1BskIm....................dUC8UOY",
+      "work_type": "MAIN",
+      "status": "ONGOING"
+    },
+    {
+      "local_folder_name": "2025-Q3-HI-B3-99 Title2",
+      "drive_folder_id": "1ePlVn....................NU61i3u",
+      "work_type": "EXTRA",
+      "status": "COMPLETE"
+    }
+  ]
+  ```
+  * `local_folder_name` - the *[Title Code](#title-code)* (`{year}-Q{quarter}-{lang_code}-B{batch_num}_{title_num} {Title}`) of the project;  
+  * `drive_folder_id` - 33-character alphanumeric Google Drive ID;
+  * `work_type` - either "MAIN" work assigned for the duration of the batch, or "EXTRA" work picked up ad-hoc (usually, when main typesetter cannot do the chapter for whatever reason);
+  * `status` - either "COMPLETE" or "ONGOING".
+
+
+
+* **drive_cache.json** - sample content :
+  ```
+  [
+
+  ]
+  ```
+  
 
 ## Project Tags (Personal)
 
