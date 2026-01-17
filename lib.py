@@ -50,6 +50,31 @@ def identify_path(base_type: str, initdir: str = "") -> str:
     return path
 
 
+def ensure_path_exists(dirpath: str, base_type: str = "file") -> bool:
+    try:
+        path_to_check = os.path.dirname(dirpath) if base_type == "file" else dirpath
+
+        if not path_to_check or path_to_check in [".", ""]:
+            return True
+
+        if not os.path.exists(path_to_check):
+            os.makedirs(path_to_check)
+
+            display_message("INFO", f"Path created : {path_to_check}.")
+            display_path_desc(path_to_check, "folder")
+            return True
+
+        if not os.path.isdir(path_to_check):
+            display_message("ERROR", f"Invalid path : {path_to_check}")
+            return False
+
+        return True
+    except Exception as err:
+        display_message("ERROR", "Path could not be created", f"{err}")
+
+        return False
+
+
 def display_path_desc(filepath: str, base_type: str) -> tuple:
     parent_name, base_name = os.path.split(filepath)
     split_parent_name = parent_name.split(os.sep)
